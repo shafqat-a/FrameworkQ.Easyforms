@@ -1,0 +1,18 @@
+{
+  "formId": "employee-feedback",
+  "formVersion": "1.0",
+  "status": "submitted",
+  "data": {
+    "employee_name": "John Doe",
+    "department": "engineering",
+    "review_date": "2025-10-11",
+    "reviewer_name": "Jane Smith",
+    "communication_rating": 4,
+    "technical_rating": 5,
+    "teamwork_rating": 4,
+    "leadership_rating": 3,
+    "strengths": "Excellent technical skills and good team player",
+    "improvements": "Could improve leadership presence",
+    "recommendation": "promotion"
+  }
+}

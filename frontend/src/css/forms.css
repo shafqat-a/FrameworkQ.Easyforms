@@ -1,0 +1,222 @@
+/**
+ * FrameworkQ.Easyforms - Base Form Styles
+ * Styles for form layout, sections, and field groups
+ */
+
+/* Form Container */
+form[data-form] {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+}
+
+/* Pages */
+[data-page] {
+    margin-bottom: 30px;
+}
+
+/* Sections */
+[data-section] {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+[data-section] > [data-title]::before {
+    content: attr(data-title);
+    display: block;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #222;
+}
+
+/* Field Groups */
+[data-group] {
+    display: grid;
+    gap: 15px;
+}
+
+[data-group][data-layout*="columns:2"] {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+[data-group][data-layout*="columns:3"] {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Form Fields */
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #555;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="email"],
+input[type="tel"],
+select,
+textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+}
+
+/* Required Fields */
+input[required],
+select[required],
+textarea[required],
+[data-required="true"] {
+    border-left: 3px solid #ff9800;
+}
+
+/* Readonly Fields */
+input[readonly],
+select[disabled],
+textarea[readonly] {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
+/* Validation States */
+.is-invalid {
+    border-color: #f44336 !important;
+}
+
+.invalid-feedback {
+    display: block;
+    color: #f44336;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.is-valid {
+    border-color: #4CAF50;
+}
+
+/* Tables */
+table[data-table] {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+}
+
+table[data-table] th,
+table[data-table] td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+table[data-table] thead {
+    background-color: #f5f5f5;
+}
+
+table[data-table] th {
+    font-weight: 600;
+    color: #333;
+}
+
+table[data-table] input {
+    width: 100%;
+}
+
+table[data-table] tfoot {
+    background-color: #fafafa;
+    font-weight: 600;
+}
+
+/* Buttons */
+button, .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+button[type="submit"], .btn-primary {
+    background-color: #4CAF50;
+    color: white;
+}
+
+button[type="submit"]:hover, .btn-primary:hover {
+    background-color: #45a049;
+}
+
+button[type="button"], .btn-secondary {
+    background-color: #757575;
+    color: white;
+}
+
+button[type="button"]:hover, .btn-secondary:hover {
+    background-color: #616161;
+}
+
+/* Conditional Visibility */
+[data-when].hidden {
+    display: none;
+}
+
+/* Error Summary */
+[data-error-summary] {
+    background-color: #ffebee;
+    border: 1px solid #f44336;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+[data-error-summary] h4 {
+    margin: 0 0 10px 0;
+    color: #c62828;
+}
+
+[data-error-summary] ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+[data-error-summary] li {
+    color: #d32f2f;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    [data-group][data-layout*="columns"] {
+        grid-template-columns: 1fr;
+    }
+
+    table[data-table] {
+        font-size: 12px;
+    }
+
+    table[data-table] th,
+    table[data-table] td {
+        padding: 6px;
+    }
+}

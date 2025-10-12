@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Print Example - HTMLDSL</title>
+    <link rel="stylesheet" href="../../frontend/src/css/forms.css">
+    <link rel="stylesheet" href="../../frontend/src/css/print.css" media="print">
+    <style>
+        /* Additional print-specific inline styles for demo */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 15mm 10mm 15mm 10mm;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="no-print">Print-Optimized Form (Press Ctrl+P / Cmd+P to test)</h1>
+
+    <form data-form="print-demo"
+          data-title="Daily Inspection Checklist"
+          data-version="1.0"
+          data-print-page-size="A4"
+          data-print-orientation="portrait"
+          data-print-margins-mm="15,10,15,10">
+
+        <!-- Header (appears on every page) -->
+        <section data-section id="form-header" data-keep-together>
+            <table style="width: 100%; border: 1px solid #000; margin-bottom: 10px;">
+                <tr>
+                    <td rowspan="3" style="width: 30%; text-align: center; font-weight: bold;">
+                        ORGANIZATION NAME
+                    </td>
+                    <td style="width: 35%;">Document No: QF-001</td>
+                    <td style="width: 35%;">Rev No: 01</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="font-size: 16pt; text-align: center; font-weight: bold;">
+                        Daily Inspection Checklist
+                    </td>
+                </tr>
+                <tr>
+                    <td>Effective Date: 2025-01-01</td>
+                    <td>Page <span data-page-counter></span> of <span data-page-total></span></td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Inspection Details -->
+        <section data-section id="details" data-keep-together>
+            <table data-table id="inspection-items"
+                   data-row-mode="finite"
+                   data-print-repeat-head-rows="1">
+                <thead>
+                    <tr>
+                        <th data-col="item" data-width="10mm" data-align="center">Item</th>
+                        <th data-col="checkpoint" data-width="80mm" data-align="left">Checkpoint</th>
+                        <th data-col="status" data-width="20mm" data-align="center">Status</th>
+                        <th data-col="remarks" data-width="50mm" data-align="left">Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-row-template>
+                        <td data-align="center"><input name="item" type="text" readonly value="1" style="width: 100%; text-align: center;"></td>
+                        <td><input name="checkpoint" type="text" value="Safety equipment in place" readonly style="width: 100%;"></td>
+                        <td data-align="center">
+                            <select name="status" style="width: 100%;">
+                                <option value="">-</option>
+                                <option value="OK">OK</option>
+                                <option value="NG">NG</option>
+                            </select>
+                        </td>
+                        <td><input name="remarks" type="text" style="width: 100%;"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Signature section -->
+        <section data-section id="signatures" data-pagebreak="avoid" data-keep-together>
+            <div style="margin-top: 20mm; border-top: 1px solid #000; padding-top: 5mm;">
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="width: 33%; text-align: center;">
+                            <div style="margin-top: 15mm; border-top: 1px solid #000; padding-top: 2mm;">
+                                Prepared by
+                            </div>
+                        </td>
+                        <td style="width: 33%; text-align: center;">
+                            <div style="margin-top: 15mm; border-top: 1px solid #000; padding-top: 2mm;">
+                                Reviewed by
+                            </div>
+                        </td>
+                        <td style="width: 33%; text-align: center;">
+                            <div style="margin-top: 15mm; border-top: 1px solid #000; padding-top: 2mm;">
+                                Approved by
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <div class="no-print" style="margin-top: 20px; padding: 15px; background: #ffffcc; border: 1px solid #ffcc00;">
+            <strong>Print Instructions:</strong>
+            <ul>
+                <li>Press <kbd>Ctrl+P</kbd> (Windows) or <kbd>Cmd+P</kbd> (Mac) to preview print</li>
+                <li>Notice: Buttons hidden, borders added, page breaks applied</li>
+                <li>Headers repeat if table spans multiple pages</li>
+                <li>Signature section kept together</li>
+            </ul>
+        </div>
+
+    </form>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../../frontend/src/js/table-manager.js"></script>
+    <script src="../../frontend/src/js/formruntime.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var formRuntime = FormRuntimeHTMLDSL.mount('form[data-form]', {
+                debug: true
+            });
+
+            // Add sample rows
+            var $table = $('table[data-table]');
+            for (var i = 2; i <= 10; i++) {
+                window.TableManager.addRow($table, {
+                    item: i,
+                    checkpoint: 'Checkpoint ' + i,
+                    status: '',
+                    remarks: ''
+                });
+            }
+
+            console.log('Print demo initialized');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,517 @@
+# HTMLDSL Specification (Draft v0.1)
+
+Status: Draft
+Scope: Defines an HTML-based DSL for designing, rendering, and extracting structured forms compatible with Formflow.
+
+## 1. Goals
+- Pixel-perfect layout through HTML + CSS, print fidelity via media CSS.
+- Use native HTML inputs as fields; annotate semantics with data-attributes.
+- Enable automated schema extraction to JSON (and SQL DDL generation).
+- Support runtime interactivity: formulas, validation, conditional visibility, data fetching.
+- Keep IDs and naming stable (`[a-z0-9_-]+`).
+
+Non-goals (initially): full workflow/approvals; file uploads PKI; arbitrary scripts. These may be extensions.
+
+## 2. Naming & Conventions
+- IDs: `form id`, `page id`, `section id`, `widget id`, and `field name` must match `^[a-z0-9_-]+$`.
+- Use native HTML semantics (labels, inputs, tables) for accessibility.
+- All machine semantics are added via `data-*` attributes.
+
+## 3. Document Structure
+- `<form>` element is the root:
+  - `data-form` (required): unique form id
+  - `data-title`: human title
+  - `data-version`: e.g., `"1.0"`
+  - Optional: `data-locale="en,bn"`, `data-store="jsonb|normalized"`, `data-tags="tag1,tag2"`
+- Pages are containers within the form:
+  - Any block element with `data-page` (e.g., `<section data-page id="page-1" data-title="Page 1">`)
+- Sections are containers within a page:
+  - Any block element with `data-section` (e.g., `<section data-section id="section-1" data-title="Section 1">`)
+  - Optional: `data-numbering="auto|none|decimal|alpha|roman"`, `data-level="0..N"`, `data-collapsible="true|false"`, `data-collapsed="true|false"`
+
+## 4. Widgets & Attributes
+Widgets appear inside sections. Each widget uses either native HTML elements or a wrapper with `data-widget`.
+
+### 4.1 Field (single input)
+- Native input/select/textarea acts as the field.
+- Required attributes:
+  - `name`: field key (slug)
+- Optional attributes:
+  - `data-type="string|text|integer|decimal|date|time|datetime|bool|enum|attachment|signature"`
+  - `data-label`: label if not using `<label for>`
+  - `data-required="true|false"` (or native `required`)
+  - `data-readonly="true|false"` (or native `readonly`)
+  - `data-default`, `data-unit`, `data-pattern`, `data-min`, `data-max`, `data-format`
+  - `data-enum="A|B|C"` (for enum types or populate via JS)
+  - `data-compute="expression"` (formula), `data-override="true|false"`
+  - `data-when="expression"` (conditional visibility)
+
+Example:
+```html
+<label for="total">Total</label>
+<input id="total" name="total" type="number" data-type="decimal" data-compute="forced + scheduled" data-readonly>
+```
+
+### 4.2 Group (container of multiple fields)
+- Wrapper element with `data-group` and optional layout hints.
+- Layout options:
+  - `data-layout="columns:N"` (auto-flow into N columns via CSS grid)
+  - `data-layout="table"` (render with an HTML `<table>` for print-ready alignment)
+- Table layout cells: Use `<table>` structure; place fields inside `<td>`; spans use native `rowspan/colspan`.
+
+Example (auto columns):
+```html
+<div data-group id="ctx" data-layout="columns:2">
+  <label for="substation">Substation</label>
+  <input id="substation" name="substation" data-type="string" data-required>
+  <label for="month">Month</label>
+  <input id="month" name="month" type="month" data-type="date" data-required>
+  <!-- more fields -->
+  </div>
+```
+
+### 4.3 Table (row list)
+- Wrapper: `<table data-table id="table-1" ...>`
+- Header defines columns via `<th data-col="name" data-type="..." data-label="..." [data-required] [data-readonly] [data-unit] [data-pattern] [data-min] [data-max] [data-enum] [data-default] [data-formula] [data-format]>`.
+- Body template: One `<tr data-row-template>` contains inputs with `name` matching `data-col` names.
+- Attributes:
+  - `data-row-mode="infinite|finite"`
+  - `data-min-rows`, `data-max-rows`
+  - `data-allow-add-rows="true|false"`, `data-allow-delete-rows="true|false"`
+- Aggregates: `<tfoot>` cells may include `data-agg="sum(col)|avg(col)|min(col)|max(col)|count()"` and `data-target="#inputId"`.
+
+Example:
+```html
+<table data-table id="measurements" data-row-mode="infinite" data-allow-add-rows>
+  <thead>
+    <tr>
+      <th data-col="forced" data-type="integer" data-label="Forced"></th>
+      <th data-col="scheduled" data-type="integer" data-label="Scheduled"></th>
+      <th data-col="total" data-type="integer" data-label="Total" data-formula="forced + scheduled"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr data-row-template>
+      <td><input name="forced" type="number" step="1" min="0"></td>
+      <td><input name="scheduled" type="number" step="1" min="0"></td>
+      <td><input name="total" type="number" data-computed></td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2" class="text-end">Sum Total</td>
+      <td data-agg="sum(total)" data-target="#grand_total"></td>
+    </tr>
+  </tfoot>
+</table>
+```
+
+### 4.4 Grid (2D matrix)
+Two options:
+- HTML table with `data-grid` (rows/columns generated by JS from attributes)
+- Or static `<table>` with predefined rows/cols for total control.
+
+Attributes:
+- `data-grid` on `<table>`
+- `data-rows="finite|infinite"`, with optional `data-row-values="..."`
+- `data-columns="values:1,2,3|days-of-month|times:HH:mm-HH:mm/step"`
+- `data-cell-type="string|integer|decimal|enum|bool"`, `data-cell-enum="A|B|C"`
+
+### 4.5 Checklist
+- Wrapper: `<div data-checklist id="...">`
+- Items: `<div data-item key="slug"> ... </div>` with inner checkbox or select, or use a simple `<ul>`.
+
+### 4.6 FormHeader
+- Wrapper: `<table data-widget="formheader">` with inner structure controlled by HTML.
+- Optional binding fields via input names: `document_no`, `revision_no`, `effective_date`, `organization`.
+
+### 4.7 Signature
+- Wrapper: `<div data-widget="signature" data-role="Approved by" data-show-date="true" data-signature-type="draw|upload|both">`
+- Inner fields: `name`, `designation`, `date`, and signature area (canvas/file input) as needed.
+
+### 4.8 Notes
+- Wrapper: `<aside data-widget="notes" data-style="info|warning|note" data-title="...">Content</aside>`
+
+### 4.9 RadioGroup
+- Wrapper: `<div data-widget="radiogroup" id="..." data-required>`
+- Children: `<input type="radio" name="group_id" value="..." id="..._opt1"><label ...>`
+- Optional: `data-orientation="horizontal|vertical|grid"`
+
+### 4.10 CheckboxGroup
+- Wrapper: `<div data-widget="checkboxgroup" id="..." data-min-selections="0" data-max-selections="N">`
+- Children: multiple `<input type="checkbox" name="group_id_optX" value="...">`
+
+### 4.11 TimePicker
+- Native `<input type="time">` with optional `data-format="12h|24h"`, `data-step-minutes`, `data-show-seconds`.
+
+### 4.12 HierarchicalChecklist
+- Nested list: `<ol data-widget="hierarchicalchecklist" data-numbering="decimal|alpha|roman|none">`
+- Items: `<li data-key="slug">Label <input type="checkbox" id="..." /></li>`
+
+## 5. Expressions
+- Field formula: `data-compute="expression"` (e.g., `forced + scheduled`)
+- Conditional visibility: `data-when="expression"` on any container/widget
+- Aggregates: `data-agg="sum(col)|avg(col)|min(col)|max(col)|count()"`
+- Expression context:
+  - Same row table columns: refer by column name
+  - Global fields: refer by field `name`
+  - Functions: `sum, avg, min, max, count, round, abs, ceil, floor`
+
+## 6. Validation
+- Prefer native attributes: `required, pattern, min, max, step`.
+- Mirror as data-* to support extraction and cross-runtime validation.
+- Group/radio/checkbox constraints via `data-min-selections`, `data-max-selections`.
+
+## 7. Data Extraction (HTML → JSON)
+A parser walks the DOM to produce a canonical JSON model:
+- Form: `id, title, version, pages[]` from `form[data-form]`, `data-title`, `data-version`.
+- Pages: containers with `data-page`, `id`, `data-title`.
+- Sections: `data-section`, attributes (`numbering`, `level`, etc.).
+- Widgets:
+  - Fields: detect inputs/select/textarea with `name`; capture data-* and nearby `<label>`.
+  - Table: from `table[data-table]`; columns from `<th data-col>`; row template inputs; aggregates from `<tfoot>`.
+  - Other widgets: wrappers with `data-widget`.
+
+Example extracted shape (abridged):
+```json
+{
+  "form": {
+    "id": "qf-gmd-01",
+    "title": "Log Sheet",
+    "version": "1.0",
+    "pages": [
+      {
+        "id": "page-1",
+        "title": "Page 1",
+        "sections": [
+          {
+            "id": "main",
+            "title": "Main",
+            "widgets": [
+              {"type": "field", "id": "meter_reading", "field": {"name": "meter_reading", "type": "integer", "required": true}},
+              {"type": "table", "id": "measurements", "table": {"row_mode": "infinite", "columns": [{"name": "timestamp", "type": "datetime"}, {"name": "voltage_kv", "type": "decimal"}, {"name": "current_a", "type": "decimal"}, {"name": "power_mw", "type": "decimal", "formula": "voltage_kv * current_a / 1000"}]}}
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+## 8. SQL Mapping (Reporting Tables)
+For each `table[data-table]` and `table[data-grid]`:
+- Table name: `<form_id>_<page_id>_<section_id>_<widget_id>`
+- Standard columns: `instance_id (UUID/GUID)`, `page_id`, `section_id`, `widget_id`, row key, `recorded_at`.
+- Data columns: Map `data-type` to provider types (PostgreSQL or SQL Server). See 14.4 for explicit type table.
+- Computed columns: translate `data-formula` with null-safe `COALESCE()` rules.
+- Indexes: instance/time; plus user-specified via `data-indexes` (optional, comma-separated list).
+
+## 9. JavaScript Runtime Contract
+A lightweight runtime enhances a compliant HTML document:
+- Initialize: `FormRuntimeHTMLDSL.mount(formElement)`
+- Responsibilities:
+  - Evaluate `data-compute` on change; lock computed fields (readonly)
+  - Manage table row add/remove for `data-row-mode="infinite"`
+  - Calculate `data-agg` into `data-target` elements
+  - Enforce `data-when` visibility toggles
+  - Native validation + extra rules (min/max selections)
+  - Serialize values for save/submit; optionally call `/api/runtime/...`
+- Extensibility:
+  - Data fetching: `data-fetch="GET:/api/options?for=field"` on `<select>`; expects JSON `[ {value,label}, ... ]`
+  - Events: emit custom events `formdsl:ready`, `formdsl:change`, `formdsl:submit`
+
+## 10. Accessibility & i18n
+- Labels must associate via `for` and `id` or `aria-labelledby`.
+- Use semantic elements where possible (`section`, `table`, `thead`, `tbody`, `tfoot`).
+- i18n: Prefer textual labels in HTML; optional `data-label-*` (e.g., `data-label-bn`).
+
+## 11. Security & Sanitization
+- Disallow inline `<script>` inside templates beyond the mounting snippet.
+- Sanitize templates on server-side imports.
+- Limit allowed attributes/tags if accepting user-supplied HTML.
+
+## 12. Interop & Migration
+- Canonical path A: Treat HTMLDSL as source-of-truth; extract to current JSON/YAML DTO for storage.
+- Canonical path B: Continue supporting YAML DSL in parallel; add HTML importer/exporter.
+- Recommendation: Start with A (HTML → extracted JSON), preserving existing API shapes to minimize backend changes.
+
+## 13. Open Questions
+- Versioning of templates vs data schema drift strategies.
+- Declarative row/column generators for Grids beyond static HTML.
+- Print pagination hints (page breaks, headers/footers) in CSS.
+
+---
+This is a living spec. See `examples/` for concrete patterns and test fixtures.
+
+## 14. Print & Pagination (Pixel-Perfect)
+
+For fidelity with paper originals:
+
+- Root `<form>` print hints
+  - `data-print-page-size="A4|Letter|Legal|Tabloid|Custom:WxHmm"`
+  - `data-print-margins-mm="top,right,bottom,left"` (e.g., `10,10,10,10`)
+  - `data-print-orientation="portrait|landscape"`
+  - `data-print-scale="0.5..2.0"` optional
+
+- Page/Section pagination hints
+  - `data-pagebreak="before|after|avoid"`
+  - `data-keep-together` to prevent breaking a section/table row template
+  - `data-keep-with-next` to glue headings to following content
+
+- Table header/footer repetition
+  - On `<table>`: `data-print-repeat-head-rows="N"` (default: auto from `<thead>`)
+  - On `<table>`: `data-print-repeat-foot-rows="N"` (optional)
+
+- Column width control for print layout
+  - On `<th>`: `data-width="mm|px|%"` (e.g., `data-width="18mm"`)
+  - On `<th|td>`: `data-align="left|center|right"`, `data-valign="top|middle|bottom"`, `data-wrap="wrap|nowrap"`
+
+Renderer guidance: translate these to CSS `@page`, `page-break-*`, `table{page-break-inside:auto}`, and column width styles for HTML and PDF.
+
+## 15. Complex Tables & Column Groups
+
+To match multi-row headers, merged cells, and grouped columns seen in the samples:
+
+- Use native `colspan`/`rowspan` on `<th>` and `<td>`; annotate `<th>` with:
+  - `data-label`: printable text (if cell is a grouping header)
+  - `data-col`: column key when the header represents a data column
+  - `data-type`, `data-unit`, `data-format`, `data-formula`, `data-required`, `data-readonly`, `data-pattern`, `data-min`, `data-max`, `data-enum`
+- Optional column groups with `<colgroup>` + `<col data-col="name" style="width:...">` for stable widths across pages.
+- Sticky left header: `data-sticky-left-cols="N"` (renderer feature for wide sheets; optional)
+- Horizontal banding: `data-row-bands="odd|even|none"` (renderer hint only)
+
+Merged body cells:
+- In `<tbody>`, use native `rowspan`/`colspan` or specify table-level zones:
+  - `data-merged="r0:c0:rspan:cspan; ..."` for static merged blocks (optional helper)
+
+Totals/labels rows:
+- `<tr data-role="subtotal|total|notes">` for styling/semantics
+- `<td data-role="label" colspan="...">Total</td>`
+
+## 16. Generators (Roster, Time Axis, Enum Codes)
+
+Declarative generators reduce boilerplate for large grids but remain optional because HTML can be fully static.
+
+### 16.1 Table row generators
+On `<table data-table>`:
+- `data-row-gen="times:HH:mm-HH:mm/step"` e.g., `times:07:00-14:00/60` creates hourly rows.
+- `data-row-gen="range:start-end/step"` for numeric ranges.
+- `data-row-gen="values:a,b,c"` explicit labels.
+Generated rows adopt template from the first `<tr data-row-template>`.
+
+### 16.2 Grid column generators
+On `<table data-grid>` or `<table data-table data-as-grid>`:
+- `data-col-gen="days-of-month"` uses `data-context-month` (field `name` or ISO `YYYY-MM`) from form or `data-col-start-date` attribute.
+- `data-col-gen="times:HH:mm-HH:mm/step"` time columns.
+- `data-col-gen="values:A,B,C,..."` explicit codes.
+
+### 16.3 Enum code sets
+Cells can constrain input to defined codes (e.g., A/B/C/G/F/Ad):
+- On `<th data-col>` or cell input: `data-enum="A|B|C|G|F|Ad|"` (empty allowed)
+- Renderer may render dropdowns or letter boxes; extractor records the set for schema and constraints.
+
+## 17. Signatures, Stamps, Page Counters
+
+### 17.1 Signature blocks
+Wrapper: `<div data-widget="signature" data-role="Reviewed by" data-signature-type="draw|upload|both" data-require-image="false" data-name-required data-date-auto>`
+Children: plain inputs for `name`, `designation`, `date` and a `<canvas>` or `<input type="file">` for image.
+
+### 17.2 Rubber-stamp/Approval lines
+Use simple containers with dotted bottom borders; annotate `data-stamp` for extractor to keep semantics.
+Example: `<div data-stamp="Reviewed by (GMT-1)">...</div>`
+
+### 17.3 Page x of y
+In header/footer areas, place elements with `data-page-counter` and `data-page-total`.
+Renderer fills values at print time.
+
+## 18. Internationalization & Typography
+
+- Form-wide locales: `form[data-locale="en,bn"]`; items may use `lang` attribute or `data-label-bn` etc.
+- CSS font guidance: include enterprise fonts plus Bengali fonts for fidelity.
+- Text direction: use `dir` when needed; all data-* semantics remain language-neutral.
+
+## 19. Database Mapping Details
+
+### 19.1 Canonical structures
+- Form definitions stored unchanged (HTML), plus an extracted JSON model for versioning and diffs.
+- Submissions stored as:
+  - `form_instances(instance_id, form_id, version, submitted_at, user_id, header_ctx jsonb, raw_data jsonb)`
+  - Reporting tables per `data-table`/`data-grid` per spec 8.
+
+### 19.2 Column typing table
+Map `data-type` to SQL types (provider specific):
+
+- PostgreSQL: `string→varchar(255)`, `text→text`, `integer→integer`, `decimal→numeric(18,6)`, `date→date`, `time→time`, `datetime→timestamptz`, `bool→boolean`, `enum→varchar(100)`
+- SQL Server: `string→nvarchar(255)`, `text→nvarchar(max)`, `integer→int`, `decimal→decimal(18,6)`, `date→date`, `time→time`, `datetime→datetime2`, `bool→bit`, `enum→nvarchar(100)`
+
+### 19.3 Keys, uniqueness, indexes
+- On `<table>`: `data-row-key="col1,col2"` specifies a natural key (enforce unique)
+- On `<table>`: `data-indexes="colA;colB,colC"` defines single or composite indexes
+- On `<table>`: `data-copy-header="field1,field2"` replicates header fields into reporting rows for fast filters
+
+### 19.4 Constraints
+- Enforce `data-required`, `data-min`, `data-max`, `data-pattern`, `data-enum` in runtime and database when possible
+- Computed columns translated to generated columns (SQL Server: `AS (...) PERSISTED`; PostgreSQL: `GENERATED ALWAYS AS (...) STORED`)
+
+## 20. Sample Parity Checklist (supports the six screenshots)
+
+This section lists features required to rebuild each sample “picture-perfect” and where they are covered above.
+
+1) Consolidated Sub-station & Line Performance (QF-GMD-06)
+- Multi-row headers with grouped labels and exact column widths (Section 15)
+- Totals row and notes (15)
+- Header band with organization, doc no., revision, effective date, page x of y (17.3 + HTML)
+- Two large performance tables with remarks columns (15, 14 column width/print, 19 DB mapping)
+
+2) Monthly Shift Duty Roster (QF-GMD-14)
+- Grid with 1..31 columns via `data-col-gen="days-of-month"` (16.2)
+- Enum codes A/B/C/G/F/Ad for shifts (16.3)
+- Wide table print in landscape with repeat header (14)
+- Footer signatures and notes (17.1/17.2)
+
+3) Log Sheet (QF-GMD-01)
+- Extremely wide multi-row headers and column groups (15)
+- Time-axis rows generated hourly (16.1)
+- Multiple transformer blocks as adjacent column groups using `colspan` and `<colgroup>` widths (15)
+- Intermediate signature lines per shift band (17.1)
+- DB projection of measurements table(s) with computed fields (8, 19)
+
+4) Surveillance Visit Checklist (QF-GMD-17)
+- Hierarchical numbered checklist via `<ol data-widget="hierarchicalchecklist" data-numbering>` (Widgets 4.12)
+- Observation enums like Good/Acceptable/Poor via `data-enum` (16.3)
+- Mixed Bengali/English labels using `lang` + fonts (18)
+
+5) Bengali Daily Inspection (QF-GMD-19)
+- Bengali text and headings, bilingual labels (18)
+- Dense table cells with merged rows for subheaders (15)
+- Check columns across multiple time slots/rows (16.1)
+
+6) Availability Blocks
+- Two side-by-side small tables (A) and (B) using plain HTML tables inside a section grid (CSS) (15 + HTML)
+- Aggregations and totals as needed (15 totals row)
+
+With these additions, HTMLDSL can express all visual features and produce a deterministic schema and SQL model for storage and reporting.
+
+## 21. Validation Requirements (Authoring Model)
+
+Validation is declarative and layered. Prefer native HTML attributes, mirror with data-* for extraction, add higher-level rules with expressions and optional remote checks.
+
+### 21.1 Native + mirrored attributes
+- Native: `required, minlength, maxlength, pattern, min, max, step, readonly, disabled`
+- Mirrored: `data-required, data-pattern, data-min, data-max, data-step, data-readonly`
+- Custom messages:
+  - Field-level: `data-error` (generic), `data-error-required`, `data-error-pattern`, `data-error-min`, `data-error-max`
+  - Severity: `data-error-severity="error|warning|info"` (default: error)
+
+### 21.2 Conditional & cross-field
+- Conditional required: `data-required-when="expr"` (e.g., `voltage_kv > 0`)
+- Enable/disable: `data-enable-when="expr"`
+- Cross-field/row constraints:
+  - On any container (`form`, `[data-page]`, `[data-section]`, `table[data-table]`, `tr`):
+    - `data-constraint="expr"`
+    - `data-constraint-message="<message>"`
+    - Example (table row total): `<tr data-constraint="total == forced + scheduled" data-constraint-message="Total must equal Forced + Scheduled">`
+
+Expression context: field names resolve to the closest scope; in rows, names resolve to row cells; use `ctx.<field>` to reference global fields.
+
+### 21.3 Uniqueness & keys
+- Unique within a table (per column(s)):
+  - On `<table>`: `data-unique-by="colA,colB"` (enforced at runtime and mapped to DB unique index when feasible)
+- Unique across entire form:
+  - On field: `data-unique-scope="form"`
+
+### 21.4 Enumerations and allowed sets
+- Use `data-enum="A|B|C|..."` on `<th data-col>` or `<input/select>`
+- Optional labels map: `data-enum-labels="A:Alpha|B:Beta|..."`
+
+### 21.5 Number/text formatting
+- `data-format` hints (e.g., `0.000`, `%`, unit display); extract for report/render only
+- `data-normalize="trim|upper|lower|title|number|date"` pre-submit normalization
+
+### 21.6 Validation timing & groups
+- `data-validate-on="input|change|blur|submit|save"` (default: `change` + `submit`) 
+- `data-validate-group="immediate|deferred|submit"` for UX grouping
+
+### 21.7 Validation results contract
+Runtime marks invalid fields with `aria-invalid="true"`, `.is-invalid` class, and renders message near the control or summary list. Extractor stores validation metadata with the schema for server-side checks.
+
+## 22. Data Sources & Lookups (Dropdowns, Autocomplete, Cascades)
+
+Three ways to populate select/enum fields (in priority order):
+
+1) Inline `<option>` elements (static)
+2) Inline `data-enum="A|B|C"` (simple set)
+3) External APIs for dynamic options
+
+### 22.1 External option fetching
+On `<select>` or any input with autocomplete UI:
+- `data-fetch="<METHOD>:<URL>"` e.g., `GET:/api/options/breakers?substation={substation}&q={search}`
+- `data-fetch-on="load|focus|input|change"` (default: `focus`)
+- `data-min-chars="1"` (for `input` trigger)
+- `data-fetch-debounce="300ms"`
+- `data-fetch-map="value:id,label:name[,group:gr]"` maps response fields to option shape
+- `data-fetch-cache="ttl:10m|session|none"` (default: `session`)
+- `data-fetch-headers='{"Accept":"application/json"}'` (for public headers; auth handled by runtime config, not markup)
+
+Token substitution in URL/headers/body:
+- `{value}` current field value; `{search}` live text for autocomplete
+- `{fieldId}` or `{name}` references another field (by `id` attribute or `name`); examples: `{substation}`, `{ctx.month}`
+
+Response shape:
+- Default expects array of `{ id, name }`; use `data-fetch-map` to adapt arbitrary shapes.
+
+Example:
+```html
+<select id="breaker" name="breaker" data-type="enum"
+        data-depends="#substation"
+        data-fetch="GET:/api/breakers?substation={substation}&q={search}"
+        data-fetch-on="focus,input" data-min-chars="1"
+        data-fetch-map="value:id,label:name" data-fetch-cache="ttl:10m">
+</select>
+```
+
+### 22.2 Cascading selects
+- `data-depends="#fieldId1,#fieldId2"` ensures options reload when parent fields change
+- `data-fetch-params="substation={substation}&feeder={feeder}"` (alternative to templating in URL)
+
+### 22.3 Offline/fallback options
+- `data-options='[{"value":"A","label":"Alpha"}]'` JSON inline fallback
+- `data-options-src="#script-json-id"` pointing to `<script type="application/json" id="script-json-id">[...]</script>`
+
+## 23. Remote / Async Validation
+
+For server-side checks (e.g., uniqueness in DB, business rules, code validity):
+
+On any input/select:
+- `data-validate-url="<METHOD>:<URL>"` e.g., `POST:/api/validate/breaker`
+- `data-validate-on="blur|change|input|submit"` (default: `blur`)
+- `data-validate-debounce="300ms"`
+- `data-validate-body='{"breaker":"{value}","substation":"{substation}"}'` or leave empty for querystring
+- Expected response (default): `{ "valid": true, "message": "optional" }`
+- Adaptors (optional): `data-validate-valid-path="valid"`, `data-validate-message-path="message"` for nonstandard shapes
+
+Result handling:
+- When invalid, runtime shows message from server; may set `data-error-severity="warning"` to allow submit with confirm.
+- Remote validators should be idempotent and fast; runtime applies debounce and cancels stale requests.
+
+Security note: Do not embed secrets in markup. The runtime should inject auth headers (e.g., bearer tokens) via configuration.
+
+## 24. Error Messaging & UX Patterns
+
+- Field-level messages appear below the control with `.invalid-feedback` class (Bootstrap-compatible).
+- Summary region: any container with `data-error-summary` collects and lists messages grouped by page/section.
+- Scroll-to-first-error on submit; maintain keyboard focus order and ARIA live regions.
+- For tables, row-level errors highlight the row (`[data-row-error]`) and per-cell `.is-invalid` classes.
+
+## 25. Server & DB Enforcement
+
+Extraction pipeline should convert declarative validations into server-side checks:
+
+- Required, min, max, enum → DB `NOT NULL`, range checks, and `CHECK` constraints when safe.
+- Pattern → DB regex checks where supported (PostgreSQL `~`), or application-level if not.
+- Unique-by (table) → unique index on columns (composite when multiple); guard with transactions.
+- Cross-field constraints (`data-constraint`) → application-level validation during submit (record-level) and optionally `CHECK` when purely column-based.
+- Remote validation → application-level only; DB cannot enforce external rules.
+
+On validation failure, APIs should return `400` with `{ message, errors: { field: [messages] } }` or `422` with structured details.

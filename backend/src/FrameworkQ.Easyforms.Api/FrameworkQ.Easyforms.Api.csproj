@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FrameworkQ.Easyforms.Core\FrameworkQ.Easyforms.Core.csproj" />
+    <ProjectReference Include="..\FrameworkQ.Easyforms.Parser\FrameworkQ.Easyforms.Parser.csproj" />
+    <ProjectReference Include="..\FrameworkQ.Easyforms.Database\FrameworkQ.Easyforms.Database.csproj" />
+    <ProjectReference Include="..\FrameworkQ.Easyforms.Runtime\FrameworkQ.Easyforms.Runtime.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+</Project>

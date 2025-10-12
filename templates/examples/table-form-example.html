@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Measurements - Table Example</title>
+    <link rel="stylesheet" href="../../frontend/src/css/forms.css">
+    <link rel="stylesheet" href="../../frontend/src/css/print.css" media="print">
+</head>
+<body>
+    <h1>Performance Measurements Log Sheet</h1>
+
+    <form data-form="performance-log" data-title="Performance Measurements" data-version="1.0">
+
+        <section data-page id="page-1">
+
+            <!-- Header Info -->
+            <section data-section id="header">
+                <div data-group data-layout="columns:2">
+                    <div>
+                        <label for="substation">Substation *</label>
+                        <input id="substation" name="substation" type="text" required>
+                    </div>
+
+                    <div>
+                        <label for="log_date">Date *</label>
+                        <input id="log_date" name="log_date" type="date" required>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Measurements Table -->
+            <section data-section id="measurements">
+                <h3>Hourly Measurements</h3>
+
+                <table data-table id="readings" data-row-mode="infinite"
+                       data-allow-add-rows="true" data-allow-delete-rows="true">
+                    <thead>
+                        <tr>
+                            <th data-col="time" data-type="time" data-label="Time" data-width="100px">Time</th>
+                            <th data-col="voltage_kv" data-type="decimal" data-label="Voltage (kV)" data-required="true">Voltage (kV)</th>
+                            <th data-col="current_a" data-type="decimal" data-label="Current (A)" data-required="true">Current (A)</th>
+                            <th data-col="power_mw" data-type="decimal" data-label="Power (MW)" data-formula="voltage_kv * current_a / 1000">Power (MW)</th>
+                            <th data-col="remarks" data-type="text" data-label="Remarks">Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-row-template>
+                            <td><input name="time" type="time"></td>
+                            <td><input name="voltage_kv" type="number" step="0.1" min="0"></td>
+                            <td><input name="current_a" type="number" step="0.1" min="0"></td>
+                            <td><input name="power_mw" type="number" step="0.001" data-compute="voltage_kv * current_a / 1000" readonly></td>
+                            <td><input name="remarks" type="text"></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" style="text-align: right; font-weight: bold;">Total Power (MW)</td>
+                            <td data-agg="sum(power_mw)" data-target="#total_power">
+                                <input id="total_power" type="number" step="0.001" readonly style="font-weight: bold;">
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="text-align: right; font-weight: bold;">Average Power (MW)</td>
+                            <td data-agg="avg(power_mw)" data-target="#avg_power">
+                                <input id="avg_power" type="number" step="0.001" readonly style="font-weight: bold;">
+                            </td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </section>
+
+        </section>
+
+        <!-- Actions -->
+        <div style="margin-top: 20px; text-align: right;">
+            <button type="button" id="save-draft">Save Draft</button>
+            <button type="submit">Submit Log</button>
+        </div>
+    </form>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../../frontend/src/js/expression-evaluator.js"></script>
+    <script src="../../frontend/src/js/table-manager.js"></script>
+    <script src="../../frontend/src/js/widgets/table.js"></script>
+    <script src="../../frontend/src/js/formruntime.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize form runtime
+            var formRuntime = FormRuntimeHTMLDSL.mount('form[data-form]', {
+                apiBaseUrl: 'http://localhost:5000',
+                validateOn: 'change',
+                debug: true
+            });
+
+            console.log('Table example initialized');
+
+            // Monitor table events
+            formRuntime.$form.on('table:row:add', function(e, data) {
+                console.log('Row added at index:', data.index);
+            });
+
+            formRuntime.$form.on('table:row:remove', function(e, data) {
+                console.log('Row removed at index:', data.index);
+            });
+
+            // Save draft
+            $('#save-draft').on('click', function() {
+                var data = formRuntime.getValue(true);
+                console.log('Form data:', data);
+                alert('Draft saved (console.log output). API integration pending.');
+            });
+
+            // Submit
+            formRuntime.$form.on('submit', function(e) {
+                e.preventDefault();
+                var data = formRuntime.getValue(true);
+                console.log('Submitting:', data);
+                alert('Form submitted (console.log output). API integration pending.');
+            });
+
+            // Demo: Add 3 initial rows
+            setTimeout(function() {
+                var $table = $('table[data-table]');
+                window.TableManager.addRow($table, { time: '08:00', voltage_kv: 220, current_a: 450 });
+                window.TableManager.addRow($table, { time: '09:00', voltage_kv: 218, current_a: 455 });
+                window.TableManager.addRow($table, { time: '10:00', voltage_kv: 222, current_a: 448 });
+            }, 500);
+        });
+    </script>
+</body>
+</html>

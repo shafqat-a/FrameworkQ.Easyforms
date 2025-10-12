@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Feedback Form - HTMLDSL Example</title>
+    <link rel="stylesheet" href="../../frontend/src/css/forms.css">
+    <link rel="stylesheet" href="../../frontend/src/css/print.css" media="print">
+</head>
+<body>
+    <form data-form="employee-feedback" data-title="Employee Feedback Form" data-version="1.0">
+
+        <section data-page id="page-1" data-title="Employee Feedback">
+
+            <!-- Header Section -->
+            <section data-section id="header" data-title="Employee Information">
+                <div data-group data-layout="columns:2">
+                    <div>
+                        <label for="employee_name">Employee Name *</label>
+                        <input id="employee_name" name="employee_name" type="text"
+                               data-type="string" data-required="true" required>
+                    </div>
+
+                    <div>
+                        <label for="department">Department *</label>
+                        <select id="department" name="department" data-type="enum" required>
+                            <option value="">-- Select Department --</option>
+                            <option value="engineering">Engineering</option>
+                            <option value="sales">Sales</option>
+                            <option value="hr">Human Resources</option>
+                            <option value="finance">Finance</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="review_date">Review Date *</label>
+                        <input id="review_date" name="review_date" type="date"
+                               data-type="date" required>
+                    </div>
+
+                    <div>
+                        <label for="reviewer_name">Reviewer Name *</label>
+                        <input id="reviewer_name" name="reviewer_name" type="text"
+                               data-type="string" required>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Performance Ratings -->
+            <section data-section id="ratings" data-title="Performance Assessment">
+                <div data-group data-layout="columns:1">
+                    <div>
+                        <label for="communication_rating">Communication Skills (1-5) *</label>
+                        <input id="communication_rating" name="communication_rating" type="number"
+                               min="1" max="5" data-type="integer" required>
+                    </div>
+
+                    <div>
+                        <label for="technical_rating">Technical Skills (1-5) *</label>
+                        <input id="technical_rating" name="technical_rating" type="number"
+                               min="1" max="5" data-type="integer" required>
+                    </div>
+
+                    <div>
+                        <label for="teamwork_rating">Teamwork (1-5) *</label>
+                        <input id="teamwork_rating" name="teamwork_rating" type="number"
+                               min="1" max="5" data-type="integer" required>
+                    </div>
+
+                    <div>
+                        <label for="leadership_rating">Leadership (1-5) *</label>
+                        <input id="leadership_rating" name="leadership_rating" type="number"
+                               min="1" max="5" data-type="integer" required>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Overall Comments -->
+            <section data-section id="comments" data-title="Overall Assessment">
+                <div>
+                    <label for="strengths">Key Strengths</label>
+                    <textarea id="strengths" name="strengths" rows="3" data-type="text"></textarea>
+                </div>
+
+                <div>
+                    <label for="improvements">Areas for Improvement</label>
+                    <textarea id="improvements" name="improvements" rows="3" data-type="text"></textarea>
+                </div>
+
+                <div>
+                    <label for="recommendation">Recommendation *</label>
+                    <select id="recommendation" name="recommendation" data-type="enum" required>
+                        <option value="">-- Select Recommendation --</option>
+                        <option value="promotion">Promotion</option>
+                        <option value="lateral_move">Lateral Move</option>
+                        <option value="additional_training">Additional Training</option>
+                        <option value="performance_plan">Performance Improvement Plan</option>
+                        <option value="maintain">Maintain Current Role</option>
+                    </select>
+                </div>
+            </section>
+
+        </section>
+
+        <!-- Form Actions -->
+        <div style="margin-top: 20px; text-align: right;">
+            <button type="button" id="save-draft" style="margin-right: 10px;">Save Draft</button>
+            <button type="submit">Submit Feedback</button>
+        </div>
+    </form>
+
+    <!-- Error Summary Panel -->
+    <div data-error-summary style="display: none;">
+        <h4>Please correct the following errors:</h4>
+        <ul id="error-list"></ul>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../../frontend/src/js/formruntime.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize form runtime
+            var formRuntime = FormRuntimeHTMLDSL.mount('form[data-form]', {
+                apiBaseUrl: 'http://localhost:5000',
+                validateOn: 'change',
+                showInlineErrors: true,
+                debug: true
+            });
+
+            // Ready event
+            formRuntime.$form.on('formdsl:ready', function() {
+                console.log('Form runtime initialized');
+            });
+
+            // Change event
+            formRuntime.$form.on('formdsl:change', function(e, data) {
+                console.log('Field changed:', data.fieldName, '=', data.newValue);
+            });
+
+            // Save draft button
+            $('#save-draft').on('click', function() {
+                formRuntime.saveDraft()
+                    .done(function(result) {
+                        alert('Draft saved successfully! ID: ' + result.instanceId);
+                    })
+                    .fail(function(xhr) {
+                        var error = xhr.responseJSON || {};
+                        alert('Failed to save draft: ' + (error.message || 'Unknown error'));
+                    });
+            });
+
+            // Submit handler
+            formRuntime.$form.on('submit', function(e) {
+                e.preventDefault();
+
+                formRuntime.submit({ status: 'submitted' })
+                    .done(function(result) {
+                        alert('Form submitted successfully! ID: ' + result.instanceId);
+                        formRuntime.reset(true);
+                    })
+                    .fail(function(xhr) {
+                        var error = xhr.responseJSON || {};
+                        alert('Submission failed: ' + (error.message || 'Unknown error'));
+                    });
+            });
+        });
+    </script>
+</body>
+</html>
