@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QF-GMD-06: Consolidated Statement of Sub-Station & Transmission Line Performance</title>
+    <link rel="stylesheet" href="../../frontend/src/css/forms.css">
+    <link rel="stylesheet" href="../../frontend/src/css/print.css" media="print">
+    <style>
+        table.form-header {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        table.form-header td {
+            border: 1px solid #000;
+            padding: 5px;
+        }
+        .performance-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .performance-table th, .performance-table td {
+            border: 1px solid #000;
+            padding: 6px;
+            text-align: center;
+        }
+        .performance-table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            font-size: 10pt;
+        }
+        .computed-field {
+            background-color: #fffff0;
+        }
+        .availability-table {
+            width: 48%;
+            display: inline-table;
+            border-collapse: collapse;
+            margin: 10px 1%;
+        }
+        .availability-table th, .availability-table td {
+            border: 1px solid #000;
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+    <form data-form="qf-gmd-06"
+          data-title="Consolidated statement of Sub-Station & Transmission Line Performance"
+          data-version="1.0"
+          data-print-page-size="A4"
+          data-print-orientation="portrait">
+
+        <!-- Form Header -->
+        <section data-section id="header" data-keep-together>
+            <table class="form-header">
+                <tr>
+                    <td rowspan="2" style="width: 20%; text-align: center; font-weight: bold;">
+                        Quality<br>Management<br>System
+                    </td>
+                    <td colspan="2" style="width: 60%; text-align: center; font-weight: bold;">
+                        <div style="font-size: 12pt;">POWER GRID COMPANY OF BANGLADESH LTD.</div>
+                        <div style="font-size: 11pt; margin-top: 5px;">
+                            TITLE: Consolidated statement of Sub-Station &<br>
+                            Transmission Line Performance (Sub-station Report)
+                        </div>
+                    </td>
+                    <td rowspan="2" style="width: 20%; text-align: center; font-weight: bold;">
+                        QUALITY FORMS
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 30%;">
+                        <strong>Document No:</strong> QF-GMD-06
+                    </td>
+                    <td style="width: 30%;">
+                        <strong>Revision No.:</strong> 00 | <strong>Effective Date:</strong> 15/02/07 | <strong>Page:</strong> 1 of 1
+                    </td>
+                </tr>
+            </table>
+
+            <div style="text-align: center; font-weight: bold; font-size: 11pt; margin-bottom: 10px;">
+                POWER GRID COMPANY OF BANGLADESH LTD.
+            </div>
+            <div style="text-align: center; font-weight: bold; margin-bottom: 15px;">
+                Consolidated statement of Sub-Station & Transmission Line Performance<br>
+                (Sub-station Report)
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <section data-page id="page-1">
+
+            <!-- Identification -->
+            <section data-section id="identification">
+                <div data-group data-layout="columns:2">
+                    <div>
+                        <label for="substation">Substation:</label>
+                        <select id="substation"
+                                name="substation"
+                                data-fetch="GET:/api/proxy/fetch?endpoint=/api/substations"
+                                data-fetch-on="focus,load"
+                                required
+                                style="width: 100%;">
+                            <option value="">-- Select Substation --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="substation_id_no">Substation Identification No:</label>
+                        <input id="substation_id_no"
+                               name="substation_id_no"
+                               type="text"
+                               data-depends="#substation"
+                               style="width: 100%;">
+                    </div>
+                    <div>
+                        <label for="reference_file">Reference File:</label>
+                        <input id="reference_file"
+                               name="reference_file"
+                               type="text"
+                               style="width: 100%;">
+                    </div>
+                    <div>
+                        <label for="month">Month:</label>
+                        <input id="month"
+                               name="month"
+                               type="month"
+                               required
+                               style="width: 100%;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- (A) Sub-Station Performance -->
+            <section data-section id="substation-performance">
+                <h3>(A) Sub-Station Performance</h3>
+
+                <table data-table id="substation_performance_table"
+                       class="performance-table"
+                       data-row-mode="infinite"
+                       data-allow-add-rows="true"
+                       data-min-rows="1">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" data-col="sl_no" style="width: 40px;">Sl.<br>No.</th>
+                            <th rowspan="2" data-col="capacity" data-type="decimal" style="width: 80px;">Total Sub-<br>station<br>capacity<br>(MVA)</th>
+                            <th colspan="3">Number of interruption</th>
+                            <th colspan="3">Number of interruption</th>
+                            <th rowspan="2" data-col="energy_interruption" data-type="decimal" style="width: 80px;">Amount of<br>Energy<br>Interruption<br>(MkWh)</th>
+                            <th rowspan="2" data-col="remarks" data-type="text">Remarks</th>
+                        </tr>
+                        <tr>
+                            <th data-col="forced" data-type="integer" data-required="true" style="width: 60px;">Forced</th>
+                            <th data-col="scheduled" data-type="integer" style="width: 70px;">Scheduled</th>
+                            <th data-col="total" data-type="integer" data-formula="forced + scheduled" style="width: 50px;">Total</th>
+                            <th data-col="upto_30min" data-type="integer" style="width: 70px;">Upto 30<br>minutes</th>
+                            <th data-col="upto_1hr" data-type="integer" style="width: 70px;">Upto 01<br>hour</th>
+                            <th data-col="more_1hr" data-type="integer" style="width: 80px;">More than<br>01 hour</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-row-template>
+                            <td>1</td>
+                            <td><input name="capacity" type="number" step="0.1" min="0" style="width: 100%;"></td>
+                            <td><input name="forced" type="number" min="0" style="width: 100%;"></td>
+                            <td><input name="scheduled" type="number" min="0" style="width: 100%;"></td>
+                            <td><input name="total" type="number" data-compute="forced + scheduled" readonly class="computed-field" style="width: 100%;"></td>
+                            <td><input name="upto_30min" type="number" min="0" style="width: 100%;"></td>
+                            <td><input name="upto_1hr" type="number" min="0" style="width: 100%;"></td>
+                            <td><input name="more_1hr" type="number" min="0" style="width: 100%;"></td>
+                            <td><input name="energy_interruption" type="number" step="0.01" min="0" style="width: 100%;"></td>
+                            <td><input name="remarks" type="text" style="width: 100%;"></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr style="font-weight: bold; background-color: #f9f9f9;">
+                            <td colspan="2" style="text-align: right;">Total</td>
+                            <td data-agg="sum(forced)" data-target="#total_forced_substation"></td>
+                            <td data-agg="sum(scheduled)" data-target="#total_scheduled_substation"></td>
+                            <td data-agg="sum(total)" data-target="#total_total_substation"></td>
+                            <td data-agg="sum(upto_30min)"></td>
+                            <td data-agg="sum(upto_1hr)"></td>
+                            <td data-agg="sum(more_1hr)"></td>
+                            <td data-agg="sum(energy_interruption)" data-target="#total_energy_substation"></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </section>
+
+            <!-- (B) Line Performance -->
+            <section data-section id="line-performance">
+                <h3>B) Line Performance</h3>
+
+                <table data-table id="line_performance_table"
+                       class="performance-table"
+                       data-row-mode="infinite"
+                       data-allow-add-rows="true"
+                       data-min-rows="1">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" data-col="sl_no" style="width: 40px;">Sl.<br>No.</th>
+                            <th rowspan="2" data-col="line_length" data-type="decimal" style="width: 100px;">Total length<br>of<br>Transmission<br>line<br>(Ckt. Km.)</th>
+                            <th rowspan="2" data-col="sections" data-type="integer" style="width: 80px;">No. of Section<br>of<br>Transmission<br>line</th>
+                            <th colspan="3">Number of interruption</th>
+                            <th colspan="3">Number of interruption</th>
+                            <th rowspan="2" data-col="energy_interruption_line" data-type="decimal" style="width: 80px;">Amount of<br>Energy<br>Interruption<br>(MkWh)</th>
+                            <th rowspan="2" data-col="remarks_line" data-type="text">Remarks</th>
+                        </tr>
+                        <tr>
+                            <th data-col="forced_line" data-type="integer" data-required="true" style="width: 60px;">Forced</th>
+                            <th data-col="scheduled_line" data-type="integer" style="width: 70px;">Scheduled</th>
+                            <th data-col="total_line" data-type="integer" data-formula="forced_line + scheduled_line" style="width: 50px;">Total</th>
+                            <th data-col="upto_30min_line" data-type="integer" style="width: 70px;">Upto 30<br>minutes</th>
+                            <th data-col="upto_1hr_line" data-type="integer" style="width: 70px;">Upto 01<br>hour</th>
+                            <th data-col="more_1hr_line" data-type="integer" style="width: 80px;">More<br>than<br>01<br>hour</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-row-template>
+                            <td>1</td>
+                            <td><input name="line_length" type="number" step="0.1" min="0" style="width: 100%;"></td>
+                            <td><input name="sections" type="number" min="0" style="width: 100%;"></td>
+                            <td><input name="forced_line" type="number" min="0" style="width: 100%;"></td>
+                            <td><input name="scheduled_line" type="number" min="0" style="width: 100%;"></td>
+                            <td><input name="total_line" type="number" data-compute="forced_line + scheduled_line" readonly class="computed-field" style="width: 100%;"></td>
+                            <td><input name="upto_30min_line" type="number" min="0" style="width: 100%;"></td>
+                            <td><input name="upto_1hr_line" type="number" min="0" style="width: 100%;"></td>
+                            <td><input name="more_1hr_line" type="number" min="0" style="width: 100%;"></td>
+                            <td><input name="energy_interruption_line" type="number" step="0.01" min="0" style="width: 100%;"></td>
+                            <td><input name="remarks_line" type="text" style="width: 100%;"></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr style="font-weight: bold; background-color: #f9f9f9;">
+                            <td colspan="3" style="text-align: right;">Total</td>
+                            <td data-agg="sum(forced_line)"></td>
+                            <td data-agg="sum(scheduled_line)"></td>
+                            <td data-agg="sum(total_line)"></td>
+                            <td data-agg="sum(upto_30min_line)"></td>
+                            <td data-agg="sum(upto_1hr_line)"></td>
+                            <td data-agg="sum(more_1hr_line)"></td>
+                            <td data-agg="sum(energy_interruption_line)"></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </section>
+
+            <!-- Availability Tables -->
+            <section data-section id="availability">
+                <div style="width: 100%;">
+
+                    <!-- (A) Availability of the Sub-Station -->
+                    <table class="availability-table">
+                        <thead>
+                            <tr>
+                                <th colspan="3" style="background-color: #e0e0e0;">(A) Availability of the Sub-Station</th>
+                            </tr>
+                            <tr>
+                                <th data-col="sl_avail_sub" style="width: 60px;">Sl.<br>No.</th>
+                                <th data-col="substation_avail_pct" data-type="decimal">Sub-station<br>Availability (%)</th>
+                                <th data-col="remarks_avail_sub" data-type="text">Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td><input name="substation_avail_pct" type="number" step="0.01" min="0" max="100" style="width: 100%;"></td>
+                                <td><input name="remarks_avail_sub" type="text" style="width: 100%;"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- (B) Availability of Transmission Line -->
+                    <table class="availability-table">
+                        <thead>
+                            <tr>
+                                <th colspan="3" style="background-color: #e0e0e0;">(B) Availability of Transmission Line</th>
+                            </tr>
+                            <tr>
+                                <th data-col="sl_avail_line" style="width: 60px;">Sl.<br>No.</th>
+                                <th data-col="line_avail_pct" data-type="decimal">Transmission line<br>Availability (%)</th>
+                                <th data-col="remarks_avail_line" data-type="text">Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td><input name="line_avail_pct" type="number" step="0.01" min="0" max="100" style="width: 100%;"></td>
+                                <td><input name="remarks_avail_line" type="text" style="width: 100%;"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </section>
+
+            <!-- Copy To Section -->
+            <section data-section id="copy-to">
+                <p style="margin-top: 15px; margin-bottom: 5px;">
+                    <strong>Copy to:</strong><br>
+                    1. Manager, GMD ........... , PGCB.<br>
+                    2. Office copy.
+                </p>
+            </section>
+
+            <!-- Signature Section -->
+            <section data-section id="signatures" data-pagebreak="avoid">
+                <div data-group id="signature-group" data-layout="columns:2" style="margin-top: 30px;">
+                    <div style="text-align: center;">
+                        <div style="margin-bottom: 40px; margin-top: 20px;"></div>
+                        <label for="reviewed_by_gmt1">Reviewed by (GMT-1):</label>
+                        <input id="reviewed_by_gmt1"
+                               name="reviewed_by_gmt1"
+                               type="text"
+                               placeholder="Name and signature"
+                               style="width: 80%; border-bottom: 1px solid #000; border-top: none; border-left: none; border-right: none; text-align: center;">
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="margin-bottom: 40px; margin-top: 20px;"></div>
+                        <label for="approved_by_dt">Approved by (DT):</label>
+                        <input id="approved_by_dt"
+                               name="approved_by_dt"
+                               type="text"
+                               placeholder="Name and signature"
+                               style="width: 80%; border-bottom: 1px solid #000; border-top: none; border-left: none; border-right: none; text-align: center;">
+                    </div>
+                </div>
+            </section>
+
+        </section>
+
+    </form>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../../frontend/src/js/expression-evaluator.js"></script>
+    <script src="../../frontend/src/js/table-manager.js"></script>
+    <script src="../../frontend/src/js/widgets/table.js"></script>
+    <script src="../../frontend/src/js/data-fetch.js"></script>
+    <script src="../../frontend/src/js/formruntime.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var formRuntime = FormRuntimeHTMLDSL.mount('form[data-form]', {
+                apiBaseUrl: 'http://localhost:5000',
+                debug: true
+            });
+
+            console.log('QF-GMD-06 Performance Report initialized');
+            console.log('Tables:', $('table[data-table]').length);
+            console.log('Calculated columns:', $('[data-compute]').length);
+
+            // Demo: Populate substation dropdown
+            setTimeout(function() {
+                $('#substation').append('<option value="sub-dhanmondi">Sub-station, Dhanmondi</option>');
+                $('#substation').append('<option value="sub-gulshan">Sub-station, Gulshan</option>');
+                $('#substation').append('<option value="sub-mohakhali">Sub-station, Mohakhali</option>');
+            }, 500);
+
+            // Demo: Add sample row to show calculations
+            setTimeout(function() {
+                var $subTable = $('#substation_performance_table');
+                window.TableManager.addRow($subTable, {
+                    capacity: 132.5,
+                    forced: 3,
+                    scheduled: 2,
+                    upto_30min: 2,
+                    upto_1hr: 2,
+                    more_1hr: 1,
+                    energy_interruption: 45.5
+                });
+            }, 1000);
+
+            console.log('Demo data will populate after 1 second');
+        });
+    </script>
+</body>
+</html>

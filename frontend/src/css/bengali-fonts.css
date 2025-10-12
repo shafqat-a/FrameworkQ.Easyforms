@@ -1,0 +1,23 @@
+/**
+ * Bengali Font Configuration
+ * Imports Google Fonts for Bengali text support
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&family=Hind+Siliguri:wght@400;700&display=swap');
+
+/* Apply Bengali fonts to elements with Bengali text */
+[lang="bn"],
+.bengali-text {
+    font-family: 'Noto Sans Bengali', 'Hind Siliguri', sans-serif;
+}
+
+/* Ensure Bengali text renders correctly in tables */
+table [lang="bn"],
+table .bengali-text {
+    font-family: 'Noto Sans Bengali', 'Hind Siliguri', sans-serif;
+}
+
+/* Mixed English and Bengali forms */
+form[data-locale*="bn"] {
+    font-family: 'Noto Sans Bengali', 'Hind Siliguri', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}

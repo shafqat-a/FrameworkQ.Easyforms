@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QF-GMD-17: Surveillance Visit of Sub-Station</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="benchmark-forms.css">
+</head>
+<body>
+    <form data-form="qf-gmd-17"
+          data-title="Surveillance Visit of Sub-Station"
+          data-version="1.0"
+          data-print-page-size="A4"
+          data-print-orientation="portrait">
+
+        <!-- Form Header -->
+        <section data-section id="header" data-keep-together>
+            <table class="form-header">
+                <tr>
+                    <td rowspan="2" style="width: 25%; text-align: center; font-weight: bold;">
+                        Quality<br>Management<br>System
+                    </td>
+                    <td colspan="2" style="width: 55%; text-align: center; font-size: 14pt; font-weight: bold;">
+                        POWER GRID COMPANY OF BANGLADESH LTD.<br>
+                        <span style="font-size: 12pt;">TITLE: SURVEILLANCE VISIT OF SUB-STATION</span>
+                    </td>
+                    <td rowspan="2" style="width: 20%; text-align: center; font-weight: bold;">
+                        QUALITY FORMS
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 20%;">
+                        <strong>Form No:</strong> QF-GMD-17
+                    </td>
+                    <td style="width: 35%;">
+                        <strong>Revision No.:</strong> 01 | <strong>Effective Date:</strong> 03/03/15 | <strong>Page:</strong> 1 of 1
+                    </td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Main Content -->
+        <section data-page id="page-1">
+
+            <!-- Identification Fields -->
+            <section data-section id="identification">
+                <div data-group id="office-selector-group" data-layout="columns:2">
+                    <!-- Office/Substation Cascading Selector -->
+                    <div style="grid-column: 1 / -1;">
+                        <label for="office_name">Name of the Office / Sub-station: *</label>
+                        <select id="office_name"
+                                name="office_name"
+                                data-type="enum"
+                                data-fetch="GET:/api/proxy/fetch?endpoint=/api/offices"
+                                data-fetch-on="focus,load"
+                                data-fetch-map="value:id,label:name"
+                                data-fetch-cache="ttl:30m"
+                                required
+                                style="width: 100%;">
+                            <option value="">-- Select Office/Sub-station --</option>
+                        </select>
+                    </div>
+
+                    <!-- Dependent Fields -->
+                    <div>
+                        <label for="substation_id">Sub-Station Identification No:</label>
+                        <input id="substation_id"
+                               name="substation_id"
+                               type="text"
+                               data-type="string"
+                               data-depends="#office_name"
+                               data-fetch="GET:/api/proxy/fetch?endpoint=/api/substation-id?office={office_name}"
+                               data-fetch-on="change"
+                               style="width: 100%;">
+                    </div>
+
+                    <div>
+                        <label for="reference_file">Reference File:</label>
+                        <input id="reference_file"
+                               name="reference_file"
+                               type="text"
+                               data-type="string"
+                               style="width: 100%;">
+                    </div>
+
+                    <div>
+                        <label for="inspector_name">Name & Designation:</label>
+                        <input id="inspector_name"
+                               name="inspector_name"
+                               type="text"
+                               data-type="string"
+                               style="width: 100%;">
+                    </div>
+
+                    <div>
+                        <label for="inspection_date">Date & time inspection:</label>
+                        <input id="inspection_date"
+                               name="inspection_date"
+                               type="datetime-local"
+                               data-type="datetime"
+                               style="width: 100%;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Inspection Checklist -->
+            <section data-section id="checklist">
+                <table data-table id="inspection_items" class="checklist-table" data-row-mode="finite">
+                    <thead>
+                        <tr>
+                            <th data-col="sl_no" style="width: 80px;">Sl. No.</th>
+                            <th data-col="item" style="width: 50%;">Item</th>
+                            <th data-col="observation" style="width: 25%;">Observation</th>
+                            <th data-col="remarks" style="width: 25%;">Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 1.0 Transformer -->
+                        <tr data-row-template>
+                            <td class="item-number">1.0</td>
+                            <td><strong>Transformer</strong></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">1.1</td>
+                            <td>Silica gel</td>
+                            <td>
+                                <select name="observation_1_1" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Acceptable">Acceptable</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_1_1" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">1.2</td>
+                            <td>Oil level</td>
+                            <td>
+                                <select name="observation_1_2" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Acceptable">Acceptable</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_1_2" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">1.3</td>
+                            <td>Oil Test</td>
+                            <td>
+                                <select name="observation_1_3" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Acceptable">Acceptable</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_1_3" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">1.4</td>
+                            <td>Oil leakage</td>
+                            <td>
+                                <select name="observation_1_4" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_1_4" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">1.5</td>
+                            <td>Functioning of Tap Changer</td>
+                            <td>
+                                <select name="observation_1_5" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Healthy">Healthy</option>
+                                    <option value="Defective">Defective</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_1_5" type="text" style="width: 100%;"></td>
+                        </tr>
+
+                        <!-- 2.0 Circuit Breaker -->
+                        <tr data-row-template>
+                            <td class="item-number">2.0</td>
+                            <td><strong>Circuit Breaker</strong></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">2.1</td>
+                            <td>Physical Condition</td>
+                            <td>
+                                <select name="observation_2_1" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Acceptable">Acceptable</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_2_1" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">2.2</td>
+                            <td>SF₆ Gas/Air/Oil Leakage</td>
+                            <td>
+                                <select name="observation_2_2" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_2_2" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">2.3</td>
+                            <td>Remote Operation</td>
+                            <td>
+                                <select name="observation_2_3" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Healthy">Healthy</option>
+                                    <option value="Defective">Defective</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_2_3" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">2.4</td>
+                            <td>Trip circuit supervision</td>
+                            <td>
+                                <select name="observation_2_4" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Healthy">Healthy</option>
+                                    <option value="Defective">Defective</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_2_4" type="text" style="width: 100%;"></td>
+                        </tr>
+
+                        <!-- 3.0 Battery & Battery Charger -->
+                        <tr data-row-template>
+                            <td class="item-number">3.0</td>
+                            <td><strong>Battery & Battery Charger</strong></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">3.1</td>
+                            <td>Physical Condition</td>
+                            <td>
+                                <select name="observation_3_1" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Acceptable">Acceptable</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_3_1" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">3.2</td>
+                            <td>Cleanliness & Electrolyte Content</td>
+                            <td>
+                                <select name="observation_3_2" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Acceptable">Acceptable</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_3_2" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">3.2</td>
+                            <td>Load Test Report</td>
+                            <td>
+                                <select name="observation_3_2b" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Acceptable">Acceptable</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_3_2b" type="text" style="width: 100%;"></td>
+                        </tr>
+
+                        <!-- 4.0 Control Panel -->
+                        <tr data-row-template>
+                            <td class="item-number">4.0</td>
+                            <td><strong>Control Panel</strong></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">4.1</td>
+                            <td>Indication lamp</td>
+                            <td>
+                                <select name="observation_4_1" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Healthy">Healthy</option>
+                                    <option value="Defective">Defective</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_4_1" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">4.2</td>
+                            <td>Annunciation</td>
+                            <td>
+                                <select name="observation_4_2" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Healthy">Healthy</option>
+                                    <option value="Defective">Defective</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_4_2" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">4.3</td>
+                            <td>Light & Heater</td>
+                            <td>
+                                <select name="observation_4_3" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Healthy">Healthy</option>
+                                    <option value="Defective">Defective</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_4_3" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">4.4</td>
+                            <td>Cleanliness</td>
+                            <td>
+                                <select name="observation_4_4" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Acceptable">Acceptable</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_4_4" type="text" style="width: 100%;"></td>
+                        </tr>
+
+                        <!-- 5.0 Relay Panel -->
+                        <tr data-row-template>
+                            <td class="item-number">5.0</td>
+                            <td><strong>Relay Panel</strong></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">5.1</td>
+                            <td>Relay Functions</td>
+                            <td>
+                                <select name="observation_5_1" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Healthy">Healthy</option>
+                                    <option value="Defective">Defective</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_5_1" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">5.2</td>
+                            <td>Light & Heater</td>
+                            <td>
+                                <select name="observation_5_2" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Healthy">Healthy</option>
+                                    <option value="Defective">Defective</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_5_2" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">5.3</td>
+                            <td>Cleanliness</td>
+                            <td>
+                                <select name="observation_5_3" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Acceptable">Acceptable</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_5_3" type="text" style="width: 100%;"></td>
+                        </tr>
+
+                        <!-- Additional Items 6-11 -->
+                        <tr data-row-template>
+                            <td class="item-number">6</td>
+                            <td>Capacitor Bank Functionality</td>
+                            <td>
+                                <select name="observation_6" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Healthy">Healthy</option>
+                                    <option value="Defective">Defective</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_6" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">7</td>
+                            <td>Earth Resistance</td>
+                            <td>
+                                <select name="observation_7" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Acceptable">Acceptable</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_7" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">8</td>
+                            <td>DFDR Functionality</td>
+                            <td>
+                                <select name="observation_8" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Healthy">Healthy</option>
+                                    <option value="Defective">Defective</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_8" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">9</td>
+                            <td>Fire Fighting equipment</td>
+                            <td>
+                                <select name="observation_9" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Acceptable">Acceptable</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_9" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">10</td>
+                            <td>Hot spot measurement</td>
+                            <td>
+                                <select name="observation_10" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Acceptable">Acceptable</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_10" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td class="item-number">11</td>
+                            <td>Maintenance work schedule</td>
+                            <td>
+                                <select name="observation_11" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Acceptable">Acceptable</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </td>
+                            <td><input name="remarks_11" type="text" style="width: 100%;"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+        </section>
+
+        <!-- Signature Section -->
+        <section data-section id="signatures" class="signature-section" data-pagebreak="avoid">
+            <div data-group id="signature-group" data-layout="columns:2">
+
+                <!-- Dy. Manager / Asst. Manager Signature -->
+                <div style="text-align: center;">
+                    <label for="dy_manager_signature">Dy. Manager / Asst. Manager</label>
+                    <input id="dy_manager_signature"
+                           name="dy_manager_signature"
+                           type="text"
+                           data-type="string"
+                           placeholder="Signature"
+                           style="width: 100%; border-bottom: 1px solid #000; border-top: none; border-left: none; border-right: none; text-align: center;">
+                    <div style="margin-top: 5px;">
+                        <input id="dy_manager_location"
+                               name="dy_manager_location"
+                               type="text"
+                               data-type="string"
+                               placeholder="Sub-station"
+                               style="width: 100%; text-align: center; border: none; border-bottom: 1px dotted #666;">
+                    </div>
+                </div>
+
+                <!-- Manager Signature -->
+                <div style="text-align: center;">
+                    <label for="manager_signature">Manager</label>
+                    <input id="manager_signature"
+                           name="manager_signature"
+                           type="text"
+                           data-type="string"
+                           placeholder="Signature"
+                           style="width: 100%; border-bottom: 1px solid #000; border-top: none; border-left: none; border-right: none; text-align: center;">
+                    <div style="margin-top: 5px;">
+                        <input id="manager_department"
+                               name="manager_department"
+                               type="text"
+                               data-type="string"
+                               placeholder="GMD. ........, PGCB."
+                               style="width: 100%; text-align: center; border: none; border-bottom: 1px dotted #666;">
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </form>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../../frontend/src/js/data-fetch.js"></script>
+    <script src="../../frontend/src/js/formruntime.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var formRuntime = FormRuntimeHTMLDSL.mount('form[data-form]', {
+                apiBaseUrl: 'http://localhost:5000',
+                debug: true
+            });
+
+            console.log('QF-GMD-17 Surveillance Checklist initialized');
+            console.log('Form has', $('select[data-type="enum"]').length, 'observation fields');
+            console.log('Office/Substation cascading selector enabled');
+
+            // For demo: populate office dropdown with sample data
+            // In production, this would come from API via data-fetch
+            setTimeout(function() {
+                $('#office_name').append('<option value="gmd-dhaka">GMD, Dhaka</option>');
+                $('#office_name').append('<option value="gmd-chittagong">GMD, Chittagong</option>');
+                $('#office_name').append('<option value="sub-dhanmondi">Sub-station, Dhanmondi</option>');
+                $('#office_name').append('<option value="sub-gulshan">Sub-station, Gulshan</option>');
+            }, 500);
+
+            // Monitor cascade for demo
+            $('#office_name').on('change', function() {
+                var office = $(this).val();
+                console.log('Office selected:', office);
+                // In production, data-fetch would auto-populate substation_id
+            });
+        });
+    </script>
+</body>
+</html>
