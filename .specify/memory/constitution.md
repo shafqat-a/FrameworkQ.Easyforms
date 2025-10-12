@@ -1,48 +1,56 @@
 <!--
-Sync Impact Report - Constitution v1.0.0
+Sync Impact Report - Constitution v1.1.0
 ===========================================
-Version change: TEMPLATE → 1.0.0 (Initial ratification)
-Created: 2025-10-11
+Version change: 1.0.0 → 1.1.0 (Minor - Material expansion of Principle I)
+Updated: 2025-10-12
 
-Modified principles: N/A (initial creation)
+Modified principles:
+  - Principle I (GitHub Workflow): Added mandatory GitHub Issues requirement
+    * All work must be tracked in GitHub Issues before starting
+    * Tasks from tasks.md must be converted to GitHub Issues
+    * Issue-driven development with `gh issue` CLI
+
 Added sections:
-  - Core Principles (5 principles defined)
-  - Development Workflow (GitHub workflow requirements)
-  - Quality Standards
-  - Governance
+  - Issue-Driven Development subsection under Development Workflow
+  - Task-to-Issue Conversion Requirements
 
-Removed sections: None (initial creation from template)
+Removed sections: None
 
 Templates requiring updates:
-  ✅ .specify/templates/plan-template.md - Constitution Check section already generic
-  ✅ .specify/templates/spec-template.md - No constitution-specific constraints
-  ✅ .specify/templates/tasks-template.md - Task organization already aligns
-  ⚠️ Future PRs must verify GitHub workflow compliance per Principle I
+  ✅ .specify/templates/plan-template.md - No changes needed
+  ✅ .specify/templates/spec-template.md - No changes needed
+  ⚠️ .specify/templates/tasks-template.md - Should reference issue creation
+  ⚠️ README.md - Update to mention issue-driven workflow
 
-Follow-up TODOs: None
+Follow-up TODOs:
+  - Update tasks template to include issue creation step
+  - Add gh CLI examples to quickstart guides
 
-Rationale for v1.0.0:
-- Initial constitution ratification
-- Establishes core principles for FrameworkQ.Easyforms project
-- GitHub workflow mandate per user requirement
+Rationale for v1.1.0:
+- Material expansion of GitHub Workflow principle
+- Strengthens issue tracking requirements (now mandatory before work starts)
+- Adds task-to-issue conversion requirement for systematic tracking
+- Backward compatible (doesn't break existing workflows, just enhances them)
 -->
 
 # FrameworkQ.Easyforms Constitution
 
 ## Core Principles
 
-### I. GitHub Workflow (NON-NEGOTIABLE)
+### I. GitHub Workflow & Issue-Driven Development (NON-NEGOTIABLE)
 
-All development MUST follow GitHub workflow practices:
+All development MUST follow GitHub workflow practices with mandatory issue tracking:
 
+- **Issue-first**: All work MUST be tracked in GitHub Issues BEFORE starting implementation
 - **Feature branches**: All work occurs on feature branches, never directly on `main`
 - **Pull requests**: All changes MUST be submitted via pull request with description and context
 - **Code review**: PRs require review before merge (recommend at least 1 approval)
 - **Branch protection**: `main` branch protected from direct pushes and force pushes
 - **Commit messages**: Descriptive commits following conventional format (e.g., `feat:`, `fix:`, `docs:`, `refactor:`)
-- **Issue tracking**: Features and bugs tracked via GitHub Issues linked to PRs
+- **Issue linking**: All PRs MUST reference related GitHub Issue(s)
+- **Task-to-Issue conversion**: Tasks from tasks.md MUST be converted to GitHub Issues for tracking
 
-**Rationale**: GitHub workflow ensures code quality through peer review, maintains clean history, enables collaboration, and provides audit trail for all changes.
+**Rationale**: GitHub Issues provide centralized tracking, enable project management visibility, facilitate team coordination, create searchable history, and ensure no work starts without documented justification. Issue-driven development prevents ad-hoc changes and maintains accountability.
 
 ### II. Modular Architecture
 
@@ -137,13 +145,61 @@ Examples:
 - [ ] Breaking changes documented
 - [ ] Related issue linked
 
+### Issue-Driven Development
+
+**Before Starting Any Work**:
+1. **Create GitHub Issue** describing the work:
+   - Clear title summarizing the change
+   - Description with context and acceptance criteria
+   - Labels (bug, enhancement, documentation, etc.)
+   - Milestone (if applicable)
+   - Assignee
+
+2. **Convert Tasks to Issues** (for planned features):
+   ```bash
+   # For each task in tasks.md, create issue
+   gh issue create --title "T001: Create backend project structure" \
+     --body "Task from specs/###-feature/tasks.md" \
+     --label "task" \
+     --milestone "Feature ###"
+   ```
+
+3. **Link Issue to Branch**:
+   ```bash
+   # Branch name should reference issue number
+   git checkout -b feature/42-add-validation  # Issue #42
+   ```
+
+4. **Link PR to Issue**:
+   - Use keywords in PR description: "Closes #42" or "Fixes #42"
+   - GitHub will auto-close issue when PR merges
+
+**Required gh CLI Commands**:
+```bash
+# List issues
+gh issue list
+
+# Create issue
+gh issue create --title "Title" --body "Description"
+
+# View issue
+gh issue view 42
+
+# Close issue
+gh issue close 42
+
+# Link to PR
+gh pr create --title "Title" --body "Closes #42"
+```
+
 ### Git Commit Hygiene
 
 **DO**:
 - Write descriptive commit messages
 - Make atomic commits (one logical change per commit)
-- Reference issue numbers in commits/PRs
+- Reference issue numbers in commits/PRs (e.g., "feat: add validation (#42)")
 - Keep commits focused and reviewable
+- Create GitHub Issue before starting work
 
 **DON'T**:
 - Commit directly to `main`
@@ -151,6 +207,7 @@ Examples:
 - Include large binary files without LFS
 - Commit secrets or credentials
 - Use `--no-verify` to skip hooks
+- Start work without a GitHub Issue
 
 ## Quality Standards
 
@@ -218,4 +275,4 @@ Testing is OPTIONAL but recommended:
 - **Templates**: `.specify/templates/` provide structure for specs, plans, tasks
 - **Commands**: `.specify/templates/commands/` define workflow automation
 
-**Version**: 1.0.0 | **Ratified**: 2025-10-11 | **Last Amended**: 2025-10-11
+**Version**: 1.1.0 | **Ratified**: 2025-10-11 | **Last Amended**: 2025-10-12

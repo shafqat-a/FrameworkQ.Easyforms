@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <title>QF-GMD-19: Sub-Station Daily Inspection (Bengali)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../frontend/src/css/forms.css">
+    <link rel="stylesheet" href="../../frontend/src/css/bengali-fonts.css">
+    <link rel="stylesheet" href="../../frontend/src/css/print.css" media="print">
+    <style>
+        body, form {
+            font-family: 'Noto Sans Bengali', sans-serif;
+        }
+        table.form-header {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        table.form-header td { border: 1px solid #000; padding: 5px; }
+
+        .inspection-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10pt;
+        }
+        .inspection-table th, .inspection-table td {
+            border: 1px solid #000;
+            padding: 5px;
+        }
+        .inspection-table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <form data-form="qf-gmd-19"
+          data-title="Sub-Station Daily Inspection Check Sheet"
+          data-version="1.0"
+          data-locale="en,bn"
+          data-print-page-size="A4">
+
+        <!-- Form Header -->
+        <section data-section id="header" data-keep-together>
+            <table class="form-header">
+                <tr>
+                    <td rowspan="2" style="width: 20%; text-align: center; font-weight: bold;">Quality<br>Management<br>System</td>
+                    <td colspan="2" style="width: 60%; text-align: center; font-weight: bold;">
+                        POWER GRID COMPANY OF BANGLADESH LTD.<br>
+                        <span style="font-size: 11pt;">TITLE: SUB-STATION DAILY INSPECTION CHECK SHEET</span>
+                    </td>
+                    <td rowspan="2" style="width: 20%; text-align: center; font-weight: bold;">QUALITY FORMS</td>
+                </tr>
+                <tr>
+                    <td><strong>Document No:</strong> QF-GMD-19</td>
+                    <td><strong>Revision No.:</strong> 01 | <strong>Effective Date:</strong> 12/12/12 | <strong>Page:</strong> 2 of 2</td>
+                </tr>
+            </table>
+
+            <div style="text-align: center; font-weight: bold; margin: 10px 0;">
+                POWER GRID COMPANY OF BANGLADESH LTD.
+            </div>
+            <div lang="bn" style="text-align: center; font-weight: bold; margin: 5px 0; font-size: 14pt;">
+                গ্রীড উপকেন্দ্রে স্থাপিত যন্ত্রপাতির প্রাত্যহিক চেক লিস্ট
+            </div>
+            <div lang="bn" style="text-align: center; font-size: 10pt; margin-bottom: 15px;">
+                (দৈনিক সকাল ০৬:০০ টা - সন্ধ্যা - ০৭:০০ টার মধ্যে পরীক্ষা / নিরীক্ষক সম্পন্ন করিতে হইবে।)
+            </div>
+
+            <div style="font-weight: bold; margin: 10px 0;">
+                Shift – B (From 14:00 hr. to 22:00 hr.)
+            </div>
+        </section>
+
+        <section data-page id="page-1">
+
+            <!-- Section A: Transformers -->
+            <section data-section id="transformers">
+                <div lang="bn" style="font-weight: bold; margin: 10px 0;">৩। ট্রান্সফর্মার ঃ</div>
+
+                <table data-table id="transformer_checks" class="inspection-table" data-row-mode="finite">
+                    <thead>
+                        <tr>
+                            <th data-col="item_bn" lang="bn" style="width: 50%;">আইটেম</th>
+                            <th data-col="condition_bn" lang="bn" style="width: 15%;">চালু / বন্ধ</th>
+                            <th colspan="7" style="background-color: #e0e0e0;">Observation Columns</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-row-template>
+                            <td lang="bn">* প্রত্যেক ট্রান্সফর্মারের জন্য পৃথক কলাম থাকবে।</td>
+                            <td></td>
+                            <td colspan="7"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td lang="bn">(ক) ট্রান্সফর্মারের স্থানিক ফ্যান, পাম্প</td>
+                            <td>
+                                <select name="condition_transformer_fan" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="Winding">Winding</option>
+                                    <option value="Oil">Oil</option>
+                                </select>
+                            </td>
+                            <td colspan="7"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td lang="bn">(খ) ট্রান্সফর্মারের অয়েল ও ওয়াডিং Temp<br>পরিবেশন ও লিপিবদ্ধকরন ঃ</td>
+                            <td lang="bn">তাপমাত্রা</td>
+                            <td colspan="7"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td lang="bn">(গ) গ্রীড ভোল্টেজ / ট্রান্সফর্মারের নেসাওয়াট/<br>অ্যাম্পিয়ার পরিবেশন</td>
+                            <td lang="bn">
+                                <select name="grid_voltage_check" data-type="enum" style="width: 100%;">
+                                    <option value="">-</option>
+                                    <option value="ভোল্ট">ভোল্ট</option>
+                                    <option value="মেঃ ওঃ">মেঃ ওঃ</option>
+                                    <option value="অ্যাম্পঃ">অ্যাম্পঃ</option>
+                                </select>
+                            </td>
+                            <td colspan="7"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Additional sections with Bengali text -->
+            <section data-section id="additional-checks">
+                <table data-table id="other_checks" class="inspection-table" data-row-mode="finite">
+                    <tbody>
+                        <tr data-row-template>
+                            <td lang="bn" style="width: 50%;">(ঘ) সিলিকা জেল</td>
+                            <td style="width: 50%;"><input name="silica_gel_check" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td lang="bn">(ঙ) তেল লেভেল</td>
+                            <td><input name="oil_level_check" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td lang="bn">(চ) তেল লিকেজ</td>
+                            <td><input name="oil_leakage" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td lang="bn">(ছ) ব্রিদিং</td>
+                            <td><input name="breathing" type="text" style="width: 100%;"></td>
+                        </tr>
+                        <tr data-row-template>
+                            <td lang="bn">(জ) ট্রান্সফর্মারের নিউট্রাসমহ অবন্যানা</td>
+                            <td><input name="transformer_neutral" type="text" style="width: 100%;"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Thermovision Check -->
+            <section data-section id="thermovision">
+                <div lang="bn" style="font-weight: bold; margin: 10px 0;">৫। সুইট ইয়াট ঃ বান্নার:</div>
+
+                <table data-table id="thermovision_check" class="inspection-table" data-row-mode="finite">
+                    <thead>
+                        <tr>
+                            <th lang="bn" style="width: 60%;">পরীক্ষা</th>
+                            <th lang="bn" style="width: 20%;">সচিক</th>
+                            <th lang="bn" style="width: 20%;">সমস্যা</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-row-template>
+                            <td lang="bn">(ক) ২৩০/১৩২ কেভি ও ৩৩ কেভি (গ্রীডের অংশে) বাস-বারের<br>
+                                বিভিন্ন জয়েন্টে Red Hot হচ্ছে কি না ? চাক্ষুষ পরিবেশন করা ঃ<br>
+                                (প্রতি সপ্তাহে Thermovision / Infra-red গান/ক্যামেরা দিয়ে<br>
+                                পরীক্ষা ও প্রতেক্ষীয় ব্যবস্থা গ্রহন / বিদ্যমান)</td>
+                            <td><input name="thermovision_ok" type="text" style="width: 100%;"></td>
+                            <td><input name="thermovision_issue" type="text" style="width: 100%;"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Signatures -->
+            <section data-section id="signatures" data-pagebreak="avoid">
+                <div data-group id="signature-group" data-layout="columns:2" style="margin-top: 20px;">
+                    <div style="text-align: center;">
+                        <div style="margin-bottom: 30px;"></div>
+                        <input name="reviewed_by" type="text" placeholder="স্বাক্ষর" style="width: 80%; border-bottom: 1px solid #000; text-align: center;">
+                        <div lang="bn" style="margin-top: 5px; font-size: 10pt;">পরীক্ষিত</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="margin-bottom: 30px;"></div>
+                        <input name="approved_by" type="text" placeholder="স্বাক্ষর" style="width: 80%; border-bottom: 1px solid #000; text-align: center;">
+                        <div lang="bn" style="margin-top: 5px; font-size: 10pt;">অনুমোদিত</div>
+                    </div>
+                </div>
+            </section>
+
+        </section>
+
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../../frontend/src/js/formruntime.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var formRuntime = FormRuntimeHTMLDSL.mount('form[data-form]', {
+                apiBaseUrl: 'http://localhost:5000',
+                debug: true
+            });
+
+            console.log('QF-GMD-19 Daily Inspection (Bengali) initialized');
+            console.log('Bengali text support enabled');
+        });
+    </script>
+</body>
+</html>

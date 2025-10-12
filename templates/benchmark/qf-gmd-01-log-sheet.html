@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QF-GMD-01: Log Sheet</title>
+    <link rel="stylesheet" href="../../frontend/src/css/forms.css">
+    <link rel="stylesheet" href="../../frontend/src/css/print.css" media="print">
+    <style>
+        @media print {
+            @page { size: A4 landscape; margin: 8mm; }
+        }
+        body { font-size: 9pt; }
+        table.form-header {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 8px;
+        }
+        table.form-header td { border: 1px solid #000; padding: 3px; font-size: 9pt; }
+
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 7pt;
+            overflow-x: auto;
+            display: block;
+        }
+        .log-table th, .log-table td {
+            border: 1px solid #000;
+            padding: 2px;
+            text-align: center;
+            min-width: 30px;
+        }
+        .log-table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        .log-table input {
+            width: 100%;
+            font-size: 7pt;
+            padding: 1px;
+        }
+        .time-col {
+            font-weight: bold;
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <form data-form="qf-gmd-01"
+          data-title="Log Sheet"
+          data-version="1.0"
+          data-print-page-size="A4"
+          data-print-orientation="landscape">
+
+        <!-- Form Header -->
+        <section data-section id="header" data-keep-together>
+            <table class="form-header">
+                <tr>
+                    <td rowspan="2" style="width: 15%; text-align: center; font-weight: bold; font-size: 8pt;">Quality<br>Management<br>System</td>
+                    <td colspan="2" style="width: 70%; text-align: center; font-weight: bold;">
+                        POWER GRID COMPANY OF BANGLADESH LTD.<br>
+                        <span style="font-size: 10pt;">TITLE: LOG SHEET</span>
+                    </td>
+                    <td rowspan="2" style="width: 15%; text-align: center; font-weight: bold; font-size: 8pt;">Quality Forms</td>
+                </tr>
+                <tr>
+                    <td style="font-size: 8pt;"><strong>Document No:</strong> QF-GMD-01</td>
+                    <td style="font-size: 8pt;"><strong>Revision No.:</strong> 00 | <strong>Effective Date:</strong> 15/02/07 | <strong>Page:</strong> 1 of 2</td>
+                </tr>
+            </table>
+
+            <div style="text-align: center; font-weight: bold; font-size: 10pt;">
+                Power Grid company of Bangladesh Limited<br>
+                Grid Maintenance Division: ..................<br>
+                ............................ Grid Sub-Station
+            </div>
+
+            <table style="width: 100%; font-size: 8pt; margin: 5px 0;">
+                <tr>
+                    <td style="width: 70%;"><strong>Commissioning Date:</strong> ............................</td>
+                    <td style="width: 30%; text-align: right;"><strong>Date:</strong> ................... <strong>Day:</strong> ...................</td>
+                </tr>
+            </table>
+        </section>
+
+        <section data-page id="page-1">
+
+            <!-- Log Sheet Table (Simplified - 2 Transformers) -->
+            <section data-section id="measurements">
+                <table data-table id="log_readings"
+                       class="log-table"
+                       data-row-mode="finite"
+                       data-print-repeat-head-rows="2">
+                    <colgroup>
+                        <col style="width: 35px;"> <!-- Time -->
+                        <!-- Transformer 1 columns -->
+                        <col style="width: 30px;"> <!-- kV -->
+                        <col style="width: 30px;"> <!-- MW -->
+                        <col style="width: 30px;"> <!-- MVAR -->
+                        <col style="width: 30px;"> <!-- Ampere -->
+                        <col style="width: 30px;"> <!-- TAP -->
+                        <col style="width: 30px;"> <!-- Winding Oil Temp -->
+                        <col style="width: 30px;"> <!-- Temp PF -->
+                        <!-- Transformer 2 columns -->
+                        <col style="width: 30px;"> <!-- kV -->
+                        <col style="width: 30px;"> <!-- MW -->
+                        <col style="width: 30px;"> <!-- MVAR -->
+                        <col style="width: 30px;"> <!-- Ampere -->
+                        <col style="width: 30px;"> <!-- TAP -->
+                        <col style="width: 30px;"> <!-- Winding Oil Temp -->
+                        <col style="width: 30px;"> <!-- Temp PF -->
+                        <col style="width: 40px;"> <!-- Total MW -->
+                    </colgroup>
+                    <thead>
+                        <!-- Row 1: Transformer Groups -->
+                        <tr>
+                            <th rowspan="3">Time</th>
+                            <th colspan="7">Transformer TR # .....</th>
+                            <th colspan="7">Transformer TR # .....</th>
+                            <th rowspan="3">kV Total<br>MW</th>
+                        </tr>
+                        <!-- Row 2: kV side headers -->
+                        <tr>
+                            <th colspan="7">kV side</th>
+                            <th colspan="7">kV side</th>
+                        </tr>
+                        <!-- Row 3: Individual column headers -->
+                        <tr>
+                            <th data-col="tr1_kv">kV</th>
+                            <th data-col="tr1_mw">MW</th>
+                            <th data-col="tr1_mvar">MVAR</th>
+                            <th data-col="tr1_ampere">Ampere</th>
+                            <th data-col="tr1_tap">TAP</th>
+                            <th data-col="tr1_winding_oil">Winding<br>Oil<br>Temp</th>
+                            <th data-col="tr1_temp_pf">Temp<br>PF</th>
+
+                            <th data-col="tr2_kv">kV</th>
+                            <th data-col="tr2_mw">MW</th>
+                            <th data-col="tr2_mvar">MVAR</th>
+                            <th data-col="tr2_ampere">Ampere</th>
+                            <th data-col="tr2_tap">TAP</th>
+                            <th data-col="tr2_winding_oil">Winding<br>Oil<br>Temp</th>
+                            <th data-col="tr2_temp_pf">Temp<br>PF</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Time rows 7:00 to 22:00 -->
+                        <tr data-row-template><td class="time-col">7:00</td><td><input name="tr1_kv" type="number" step="0.1"></td><td><input name="tr1_mw" type="number" step="0.1"></td><td><input name="tr1_mvar" type="number" step="0.1"></td><td><input name="tr1_ampere" type="number" step="0.1"></td><td><input name="tr1_tap" type="number"></td><td><input name="tr1_winding_oil" type="number"></td><td><input name="tr1_temp_pf" type="number" step="0.01"></td><td><input name="tr2_kv" type="number" step="0.1"></td><td><input name="tr2_mw" type="number" step="0.1"></td><td><input name="tr2_mvar" type="number" step="0.1"></td><td><input name="tr2_ampere" type="number" step="0.1"></td><td><input name="tr2_tap" type="number"></td><td><input name="tr2_winding_oil" type="number"></td><td><input name="tr2_temp_pf" type="number" step="0.01"></td><td><input name="total_mw" type="number" step="0.1" data-compute="tr1_mw + tr2_mw" readonly class="computed-field"></td></tr>
+                        <tr data-row-template><td class="time-col">8:00</td><td><input name="tr1_kv" type="number" step="0.1"></td><td><input name="tr1_mw" type="number" step="0.1"></td><td><input name="tr1_mvar" type="number" step="0.1"></td><td><input name="tr1_ampere" type="number" step="0.1"></td><td><input name="tr1_tap" type="number"></td><td><input name="tr1_winding_oil" type="number"></td><td><input name="tr1_temp_pf" type="number" step="0.01"></td><td><input name="tr2_kv" type="number" step="0.1"></td><td><input name="tr2_mw" type="number" step="0.1"></td><td><input name="tr2_mvar" type="number" step="0.1"></td><td><input name="tr2_ampere" type="number" step="0.1"></td><td><input name="tr2_tap" type="number"></td><td><input name="tr2_winding_oil" type="number"></td><td><input name="tr2_temp_pf" type="number" step="0.01"></td><td><input name="total_mw" type="number" step="0.1" data-compute="tr1_mw + tr2_mw" readonly class="computed-field"></td></tr>
+                        <tr data-row-template><td class="time-col">9:00</td><td><input name="tr1_kv" type="number" step="0.1"></td><td><input name="tr1_mw" type="number" step="0.1"></td><td><input name="tr1_mvar" type="number" step="0.1"></td><td><input name="tr1_ampere" type="number" step="0.1"></td><td><input name="tr1_tap" type="number"></td><td><input name="tr1_winding_oil" type="number"></td><td><input name="tr1_temp_pf" type="number" step="0.01"></td><td><input name="tr2_kv" type="number" step="0.1"></td><td><input name="tr2_mw" type="number" step="0.1"></td><td><input name="tr2_mvar" type="number" step="0.1"></td><td><input name="tr2_ampere" type="number" step="0.1"></td><td><input name="tr2_tap" type="number"></td><td><input name="tr2_winding_oil" type="number"></td><td><input name="tr2_temp_pf" type="number" step="0.01"></td><td><input name="total_mw" type="number" step="0.1" data-compute="tr1_mw + tr2_mw" readonly class="computed-field"></td></tr>
+                        <tr data-row-template><td class="time-col">10:00</td><td><input name="tr1_kv" type="number" step="0.1"></td><td><input name="tr1_mw" type="number" step="0.1"></td><td><input name="tr1_mvar" type="number" step="0.1"></td><td><input name="tr1_ampere" type="number" step="0.1"></td><td><input name="tr1_tap" type="number"></td><td><input name="tr1_winding_oil" type="number"></td><td><input name="tr1_temp_pf" type="number" step="0.01"></td><td><input name="tr2_kv" type="number" step="0.1"></td><td><input name="tr2_mw" type="number" step="0.1"></td><td><input name="tr2_mvar" type="number" step="0.1"></td><td><input name="tr2_ampere" type="number" step="0.1"></td><td><input name="tr2_tap" type="number"></td><td><input name="tr2_winding_oil" type="number"></td><td><input name="tr2_temp_pf" type="number" step="0.01"></td><td><input name="total_mw" type="number" step="0.1" data-compute="tr1_mw + tr2_mw" readonly class="computed-field"></td></tr>
+                    </tbody>
+                </table>
+
+                <div style="margin: 10px 0; font-size: 8pt;">
+                    <strong>OLTC counter readings:</strong> At 12.00 Hr.
+                    <span style="margin-left: 20px;"><strong>Energy readings:</strong> At 12.00 Hr.</span>
+                </div>
+
+                <div style="margin: 10px 0; font-size: 8pt;">
+                    <strong>Signature of Shift-in-Charge (A shift):</strong>
+                    <input name="signature_shift_a" type="text" style="width: 200px; border-bottom: 1px solid #000; border-top: none; border-left: none; border-right: none;">
+                    <span style="margin-left: 40px;"><strong>Signature of Shift-in-Charge (B shift):</strong></span>
+                    <input name="signature_shift_b" type="text" style="width: 200px; border-bottom: 1px solid #000; border-top: none; border-left: none; border-right: none;">
+                </div>
+            </section>
+
+            <!-- Station in Charge Signature -->
+            <section data-section id="final-signature" data-pagebreak="avoid">
+                <div style="text-align: center; margin-top: 30px;">
+                    <div style="margin-bottom: 40px;"></div>
+                    <input name="station_in_charge" type="text" placeholder="Signature" style="width: 300px; border-bottom: 1px solid #000; border-top: none; border-left: none; border-right: none; text-align: center;">
+                    <div style="font-size: 9pt; margin-top: 5px;"><strong>Signature of Station in Charge:</strong></div>
+                    <div style="font-size: 8pt;">Assistant Manager / Deputy Manager</div>
+                </div>
+            </section>
+
+        </section>
+
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../../frontend/src/js/expression-evaluator.js"></script>
+    <script src="../../frontend/src/js/table-manager.js"></script>
+    <script src="../../frontend/src/js/widgets/table.js"></script>
+    <script src="../../frontend/src/js/formruntime.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var formRuntime = FormRuntimeHTMLDSL.mount('form[data-form]', {
+                apiBaseUrl: 'http://localhost:5000',
+                debug: true
+            });
+
+            console.log('QF-GMD-01 Log Sheet initialized');
+            console.log('Wide table with multi-row headers');
+            console.log('Hourly time slots: 4 rows (simplified from 16)');
+            console.log('Transformers: 2 (TR1, TR2) with 7 readings each');
+            console.log('Calculated Total MW column: tr1_mw + tr2_mw');
+
+            // The table will have horizontal scroll due to width
+            console.log('Table will scroll horizontally on screen, print in landscape');
+        });
+    </script>
+</body>
+</html>

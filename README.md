@@ -219,9 +219,13 @@ createdb easyforms_db
 
 ## Constitution
 
-This project follows strict development principles defined in `.specify/memory/constitution.md`:
+This project follows strict development principles defined in `.specify/memory/constitution.md` (v1.1.0):
 
-1. **GitHub Workflow** (NON-NEGOTIABLE) - All work via feature branches and PRs
+1. **GitHub Workflow & Issue-Driven Development** (NON-NEGOTIABLE)
+   - All work MUST be tracked in GitHub Issues before starting
+   - Tasks from tasks.md MUST be converted to GitHub Issues
+   - All work via feature branches and PRs with issue linking
+
 2. **Modular Architecture** - Clear separation of concerns
 3. **User Story-Driven Development** - Independent, incremental delivery
 4. **Design Before Code** - Specification → Research → Implementation
@@ -233,13 +237,37 @@ This project follows strict development principles defined in `.specify/memory/c
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+**IMPORTANT**: All contributions must start with a GitHub Issue!
 
-All contributions must comply with the project constitution.
+1. **Create GitHub Issue** describing your contribution
+   ```bash
+   gh issue create --title "Add amazing feature" \
+     --body "Description of the feature and why it's needed"
+   ```
+
+2. Fork the repository
+
+3. Create a feature branch referencing the issue
+   ```bash
+   git checkout -b feature/42-amazing-feature  # Where 42 is issue number
+   ```
+
+4. Commit your changes with issue reference
+   ```bash
+   git commit -m 'feat: add amazing feature (#42)'
+   ```
+
+5. Push to the branch
+   ```bash
+   git push origin feature/42-amazing-feature
+   ```
+
+6. Open a Pull Request that references the issue
+   ```bash
+   gh pr create --title "Add amazing feature" --body "Closes #42"
+   ```
+
+All contributions must comply with the project constitution (v1.1.0).
 
 ## Status
 
