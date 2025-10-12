@@ -1,0 +1,229 @@
+/**
+ * FrameworkQ.Easyforms - Print Styles
+ * Styles for pixel-perfect printing with data-print-* attribute support
+ */
+
+@media print {
+    /* Default Page Setup (can be overridden by data-print-* attributes) */
+    @page {
+        size: A4 portrait;
+        margin: 10mm;
+    }
+
+    /* Page size variations based on data-print-page-size */
+    form[data-print-page-size="A4"] {
+        /* A4: 210mm x 297mm */
+    }
+
+    form[data-print-page-size="Letter"] {
+        /* Letter: 8.5in x 11in */
+    }
+
+    form[data-print-page-size="Legal"] {
+        /* Legal: 8.5in x 14in */
+    }
+
+    /* Orientation based on data-print-orientation */
+    form[data-print-orientation="landscape"] {
+        /* Handled via @page in runtime or separate stylesheet */
+    }
+
+    /* Margins based on data-print-margins-mm */
+    /* Would be dynamically generated based on attribute values */
+
+    /* Hide non-printable elements */
+    button,
+    .btn-add-row,
+    .btn-delete-row,
+    [data-error-summary],
+    .no-print,
+    .invalid-feedback {
+        display: none !important;
+    }
+
+    /* Form Container */
+    form[data-form] {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        font-size: 10pt;
+    }
+
+    /* Pages */
+    [data-page] {
+        page-break-after: always;
+    }
+
+    [data-page]:last-child {
+        page-break-after: auto;
+    }
+
+    /* Sections */
+    [data-section] {
+        border: none;
+        margin-bottom: 10mm;
+    }
+
+    /* Page break controls */
+    [data-pagebreak="before"] {
+        page-break-before: always;
+    }
+
+    [data-pagebreak="after"] {
+        page-break-after: always;
+    }
+
+    [data-pagebreak="avoid"] {
+        page-break-inside: avoid;
+    }
+
+    [data-keep-together] {
+        page-break-inside: avoid;
+    }
+
+    [data-keep-with-next] {
+        page-break-after: avoid;
+    }
+
+    /* Tables */
+    table[data-table],
+    table[data-grid] {
+        page-break-inside: auto;
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    /* Repeat table headers on each page */
+    table[data-table] thead,
+    table[data-grid] thead {
+        display: table-header-group;
+    }
+
+    table[data-table] tfoot,
+    table[data-grid] tfoot {
+        display: table-footer-group;
+    }
+
+    table[data-table] tr,
+    table[data-grid] tr {
+        page-break-inside: avoid;
+    }
+
+    /* Table borders for print */
+    table[data-table] th,
+    table[data-table] td,
+    table[data-grid] th,
+    table[data-grid] td {
+        border: 1px solid #000;
+        padding: 2mm;
+    }
+
+    table[data-table] th,
+    table[data-grid] th {
+        background-color: #f0f0f0 !important;
+        font-weight: bold;
+    }
+
+    /* Column widths from data-width */
+    th[data-width] {
+        /* Width applied dynamically via attribute or inline style */
+    }
+
+    /* Cell alignment from data-align and data-valign */
+    [data-align="left"] {
+        text-align: left;
+    }
+
+    [data-align="center"] {
+        text-align: center;
+    }
+
+    [data-align="right"] {
+        text-align: right;
+    }
+
+    [data-valign="top"] {
+        vertical-align: top;
+    }
+
+    [data-valign="middle"] {
+        vertical-align: middle;
+    }
+
+    [data-valign="bottom"] {
+        vertical-align: bottom;
+    }
+
+    /* Text wrapping control */
+    [data-wrap="nowrap"] {
+        white-space: nowrap;
+    }
+
+    [data-wrap="wrap"] {
+        white-space: normal;
+    }
+
+    /* Backgrounds - ensure colors print */
+    * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color-adjust: exact;
+    }
+
+    /* Inputs - show values, hide controls */
+    input,
+    select,
+    textarea {
+        border: none !important;
+        background: none !important;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+    input[readonly],
+    input[data-computed] {
+        font-weight: normal;
+        background-color: #fafafa !important;
+    }
+
+    /* Page counters (data-page-counter, data-page-total) */
+    [data-page-counter]::after {
+        content: counter(page);
+    }
+
+    [data-page-total]::after {
+        content: counter(pages);
+    }
+
+    /* Print scale based on data-print-scale */
+    form[data-print-scale] {
+        /* Scale would be applied dynamically */
+    }
+}
+
+/* Landscape Orientation */
+@media print and (orientation: landscape) {
+    @page {
+        size: A4 landscape;
+    }
+}
+
+/* Letter size */
+form[data-print-page-size="Letter"] {
+    @media print {
+        @page {
+            size: letter;
+        }
+    }
+}
+
+/* Legal size */
+form[data-print-page-size="Legal"] {
+    @media print {
+        @page {
+            size: legal;
+        }
+    }
+}
+

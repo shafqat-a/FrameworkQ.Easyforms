@@ -1,0 +1,947 @@
+openapi: 3.0.3
+info:
+  title: HTMLDSL Form System API
+  description: |
+    REST API for the HTMLDSL Form System. Provides endpoints for:
+    - Form template management (upload, parse, extract schema)
+    - Database generation (create/migrate reporting tables)
+    - Form submission (save drafts, submit for approval)
+    - Data retrieval (query submissions and reporting data)
+    - External data proxying (for cascading dropdowns)
+  version: 1.0.0
+  contact:
+    name: FrameworkQ.Easyforms
+servers:
+  - url: https://api.example.com/v1
+    description: Production server
+  - url: http://localhost:5000/v1
+    description: Development server
+
+tags:
+  - name: Forms
+    description: Form template management and schema extraction
+  - name: Database
+    description: Database schema generation and migration
+  - name: Submissions
+    description: Form submission and data persistence
+  - name: Query
+    description: Data retrieval and reporting
+  - name: Proxy
+    description: External API proxying for data fetching
+
+paths:
+  /forms:
+    get:
+      summary: List all forms
+      tags: [Forms]
+      parameters:
+        - name: tags
+          in: query
+          description: Filter by comma-separated tags
+          schema:
+            type: string
+          example: "checklist,inspection"
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        '200':
+          description: List of forms
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FormSummary'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+    post:
+      summary: Create a new form
+      tags: [Forms]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                htmlFile:
+                  type: string
+                  format: binary
+                  description: HTML form template file
+              required:
+                - htmlFile
+      responses:
+        '201':
+          description: Form created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormDetail'
+        '400':
+          description: Invalid HTML or parsing error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Validation errors in form definition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /forms/{formId}:
+    get:
+      summary: Get form details
+      tags: [Forms]
+      parameters:
+        - name: formId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "qf-gmd-01"
+        - name: version
+          in: query
+          schema:
+            type: string
+          description: Specific version (defaults to latest)
+      responses:
+        '200':
+          description: Form details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormDetail'
+        '404':
+          description: Form not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      summary: Update form definition
+      tags: [Forms]
+      parameters:
+        - name: formId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                htmlFile:
+                  type: string
+                  format: binary
+              required:
+                - htmlFile
+      responses:
+        '200':
+          description: Form updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormDetail'
+        '400':
+          description: Invalid HTML
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Form not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Delete form definition
+      tags: [Forms]
+      parameters:
+        - name: formId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Form deleted successfully
+        '404':
+          description: Form not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Cannot delete - form has submissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /forms/{formId}/schema:
+    get:
+      summary: Get extracted JSON schema
+      tags: [Forms]
+      parameters:
+        - name: formId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Extracted schema
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormSchema'
+        '404':
+          description: Form not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /forms/{formId}/html:
+    get:
+      summary: Get original HTML template
+      tags: [Forms]
+      parameters:
+        - name: formId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: HTML template
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          description: Form not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /database/generate:
+    post:
+      summary: Generate database schema for a form
+      tags: [Database]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                formId:
+                  type: string
+                  example: "qf-gmd-01"
+                version:
+                  type: string
+                  example: "1.0"
+                provider:
+                  type: string
+                  enum: [sqlserver, postgresql]
+                  example: "sqlserver"
+                dryRun:
+                  type: boolean
+                  description: Return DDL without executing
+                  default: false
+              required:
+                - formId
+                - provider
+      responses:
+        '200':
+          description: Database schema generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  ddl:
+                    type: array
+                    items:
+                      type: string
+                    description: SQL DDL statements
+                  tablesCreated:
+                    type: array
+                    items:
+                      type: string
+                    description: Table names created
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Form not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /database/migrate:
+    post:
+      summary: Migrate database schema for updated form
+      tags: [Database]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                formId:
+                  type: string
+                fromVersion:
+                  type: string
+                toVersion:
+                  type: string
+                provider:
+                  type: string
+                  enum: [sqlserver, postgresql]
+                dryRun:
+                  type: boolean
+                  default: false
+              required:
+                - formId
+                - fromVersion
+                - toVersion
+                - provider
+      responses:
+        '200':
+          description: Migration completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  transformations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transformation'
+                  migrationSql:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Migration failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /submissions:
+    post:
+      summary: Submit form data
+      tags: [Submissions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                formId:
+                  type: string
+                  example: "qf-gmd-01"
+                formVersion:
+                  type: string
+                  example: "1.0"
+                status:
+                  type: string
+                  enum: [draft, submitted]
+                  default: submitted
+                headerContext:
+                  type: object
+                  description: Header fields (org, doc_no, etc.)
+                data:
+                  type: object
+                  description: Complete form data
+              required:
+                - formId
+                - formVersion
+                - data
+      responses:
+        '201':
+          description: Submission created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  instanceId:
+                    type: string
+                    format: uuid
+                  submittedAt:
+                    type: string
+                    format: date-time
+        '400':
+          description: Invalid data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '404':
+          description: Form not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /submissions/{instanceId}:
+    get:
+      summary: Get submission by ID
+      tags: [Submissions]
+      parameters:
+        - name: instanceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Submission details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submission'
+        '404':
+          description: Submission not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      summary: Update submission (drafts only)
+      tags: [Submissions]
+      parameters:
+        - name: instanceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                status:
+                  type: string
+                  enum: [draft, submitted]
+      responses:
+        '200':
+          description: Submission updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submission'
+        '400':
+          description: Cannot update non-draft submission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Submission not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Delete submission (drafts only)
+      tags: [Submissions]
+      parameters:
+        - name: instanceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Submission deleted
+        '400':
+          description: Cannot delete non-draft submission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Submission not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /query/submissions:
+    get:
+      summary: Query submissions with filtering
+      tags: [Query]
+      parameters:
+        - name: formId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, submitted, approved, rejected]
+        - name: submittedBy
+          in: query
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: toDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        '200':
+          description: Submission list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SubmissionSummary'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /query/reporting/{tableName}:
+    get:
+      summary: Query reporting table data
+      tags: [Query]
+      parameters:
+        - name: tableName
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "qf_gmd_01_page_1_main_measurements"
+        - name: instanceId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by specific submission
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: toDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+            maximum: 1000
+      responses:
+        '200':
+          description: Reporting data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      description: Dynamic structure based on table schema
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '404':
+          description: Table not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /proxy/fetch:
+    get:
+      summary: Proxy external API calls for data fetching
+      tags: [Proxy]
+      parameters:
+        - name: endpoint
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Target endpoint URL template
+          example: "/api/breakers?substation={substation}"
+        - name: method
+          in: query
+          schema:
+            type: string
+            enum: [GET, POST]
+            default: GET
+        - name: tokens
+          in: query
+          schema:
+            type: object
+          description: Token substitution values (JSON string)
+      responses:
+        '200':
+          description: Proxied response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    value:
+                      type: string
+                    label:
+                      type: string
+        '400':
+          description: Invalid endpoint or not in allowlist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '502':
+          description: External API error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    FormSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "qf-gmd-01"
+        title:
+          type: string
+          example: "Log Sheet"
+        version:
+          type: string
+          example: "1.0"
+        tags:
+          type: array
+          items:
+            type: string
+        updatedAt:
+          type: string
+          format: date-time
+
+    FormDetail:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        version:
+          type: string
+        locales:
+          type: array
+          items:
+            type: string
+        storageMode:
+          type: string
+          enum: [jsonb, normalized]
+        tags:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        schema:
+          $ref: '#/components/schemas/FormSchema'
+
+    FormSchema:
+      type: object
+      properties:
+        form:
+          type: object
+          properties:
+            id:
+              type: string
+            title:
+              type: string
+            version:
+              type: string
+            pages:
+              type: array
+              items:
+                $ref: '#/components/schemas/Page'
+
+    Page:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        sections:
+          type: array
+          items:
+            $ref: '#/components/schemas/Section'
+
+    Section:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        widgets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Widget'
+
+    Widget:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [field, group, table, grid, checklist, signature, formheader, notes, radiogroup, checkboxgroup, hierarchicalchecklist]
+        id:
+          type: string
+        field:
+          $ref: '#/components/schemas/Field'
+        table:
+          $ref: '#/components/schemas/Table'
+
+    Field:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        label:
+          type: string
+        required:
+          type: boolean
+        readonly:
+          type: boolean
+        defaultValue:
+          type: string
+        validation:
+          type: object
+
+    Table:
+      type: object
+      properties:
+        id:
+          type: string
+        rowMode:
+          type: string
+          enum: [infinite, finite]
+        columns:
+          type: array
+          items:
+            $ref: '#/components/schemas/Column'
+
+    Column:
+      type: object
+      properties:
+        name:
+          type: string
+        label:
+          type: string
+        type:
+          type: string
+        required:
+          type: boolean
+        formula:
+          type: string
+
+    Submission:
+      type: object
+      properties:
+        instanceId:
+          type: string
+          format: uuid
+        formId:
+          type: string
+        formVersion:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+        submittedBy:
+          type: string
+        status:
+          type: string
+          enum: [draft, submitted, approved, rejected]
+        headerContext:
+          type: object
+        data:
+          type: object
+
+    SubmissionSummary:
+      type: object
+      properties:
+        instanceId:
+          type: string
+          format: uuid
+        formId:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+        submittedBy:
+          type: string
+        status:
+          type: string
+
+    Transformation:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [add, remove, rename, convert]
+        field:
+          type: string
+        fromType:
+          type: string
+        toType:
+          type: string
+        newName:
+          type: string
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            correlationId:
+              type: string
+
+    ValidationError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: "VALIDATION_ERROR"
+            message:
+              type: string
+            correlationId:
+              type: string
+            details:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+              example:
+                field_name: ["Field is required", "Value must be positive"]
+                table_id.row_0.col: ["Invalid value"]
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []

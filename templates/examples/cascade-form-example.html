@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cascading Dropdown Example - HTMLDSL</title>
+    <link rel="stylesheet" href="../../frontend/src/css/forms.css">
+</head>
+<body>
+    <h1>Cascading Dropdown Demo</h1>
+    <p>This demonstrates dynamic data fetching with cascading dependencies</p>
+
+    <form data-form="cascade-demo" data-title="Equipment Selection" data-version="1.0">
+        <section data-page id="page-1">
+
+            <section data-section id="selection">
+                <div data-group data-layout="columns:1">
+
+                    <!-- Parent dropdown -->
+                    <div>
+                        <label for="substation">Substation *</label>
+                        <select id="substation" name="substation" required
+                                data-fetch="GET:/api/substations"
+                                data-fetch-on="focus"
+                                data-fetch-cache="ttl:10m">
+                            <option value="">-- Select Substation --</option>
+                        </select>
+                    </div>
+
+                    <!-- Dependent dropdown -->
+                    <div>
+                        <label for="feeder">Feeder *</label>
+                        <select id="feeder" name="feeder" required
+                                data-fetch="GET:/api/feeders?substation={substation}"
+                                data-fetch-on="focus"
+                                data-depends="#substation"
+                                data-fetch-cache="ttl:5m">
+                            <option value="">-- Select Feeder --</option>
+                        </select>
+                    </div>
+
+                    <!-- Second-level dependent dropdown -->
+                    <div>
+                        <label for="breaker">Breaker *</label>
+                        <select id="breaker" name="breaker" required
+                                data-fetch="GET:/api/breakers?substation={substation}&feeder={feeder}"
+                                data-fetch-on="focus"
+                                data-depends="#substation,#feeder"
+                                data-fetch-map="value:id,label:name"
+                                data-fetch-cache="session">
+                            <option value="">-- Select Breaker --</option>
+                        </select>
+                    </div>
+
+                    <!-- Display selected info -->
+                    <div style="margin-top: 20px; padding: 10px; background: #f0f0f0; border-radius: 4px;">
+                        <strong>Selected:</strong>
+                        <div id="selection-info">No selection yet</div>
+                    </div>
+
+                </div>
+            </section>
+
+        </section>
+
+        <button type="submit">Submit Selection</button>
+    </form>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../../frontend/src/js/expression-evaluator.js"></script>
+    <script src="../../frontend/src/js/data-fetch.js"></script>
+    <script src="../../frontend/src/js/formruntime.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Mock API responses for demo
+            window.mockApiResponses = {
+                '/api/substations': [
+                    { id: 'sub-1', name: 'Substation Alpha' },
+                    { id: 'sub-2', name: 'Substation Beta' },
+                    { id: 'sub-3', name: 'Substation Gamma' }
+                ],
+                '/api/feeders': {
+                    'sub-1': [{ id: 'f1-1', name: 'Feeder A1' }, { id: 'f1-2', name: 'Feeder A2' }],
+                    'sub-2': [{ id: 'f2-1', name: 'Feeder B1' }, { id: 'f2-2', name: 'Feeder B2' }],
+                    'sub-3': [{ id: 'f3-1', name: 'Feeder C1' }]
+                },
+                '/api/breakers': {
+                    'f1-1': [{ id: 'br1', name: 'Breaker 1' }, { id: 'br2', name: 'Breaker 2' }],
+                    'f1-2': [{ id: 'br3', name: 'Breaker 3' }],
+                    'f2-1': [{ id: 'br4', name: 'Breaker 4' }, { id: 'br5', name: 'Breaker 5' }]
+                }
+            };
+
+            var formRuntime = FormRuntimeHTMLDSL.mount('form[data-form]', {
+                apiBaseUrl: 'http://localhost:5000',
+                debug: true
+            });
+
+            // For demo: Simulate API responses with mock data
+            // Populate substations manually
+            $('#substation').append('<option value="sub-1">Substation Alpha</option>');
+            $('#substation').append('<option value="sub-2">Substation Beta</option>');
+            $('#substation').append('<option value="sub-3">Substation Gamma</option>');
+
+            // Monitor changes
+            formRuntime.$form.on('change', 'select', function() {
+                var substation = $('#substation option:selected').text();
+                var feeder = $('#feeder option:selected').text();
+                var breaker = $('#breaker option:selected').text();
+
+                $('#selection-info').html(
+                    '<div>Substation: ' + (substation || 'Not selected') + '</div>' +
+                    '<div>Feeder: ' + (feeder || 'Not selected') + '</div>' +
+                    '<div>Breaker: ' + (breaker || 'Not selected') + '</div>'
+                );
+            });
+
+            // Simulate cascade for demo
+            $('#substation').on('change', function() {
+                var sub = $(this).val();
+                $('#feeder').empty().append('<option value="">-- Select Feeder --</option>');
+                $('#breaker').empty().append('<option value="">-- Select Breaker --</option>');
+
+                if (sub && window.mockApiResponses['/api/feeders'][sub]) {
+                    window.mockApiResponses['/api/feeders'][sub].forEach(function(item) {
+                        $('#feeder').append('<option value="' + item.id + '">' + item.name + '</option>');
+                    });
+                }
+            });
+
+            $('#feeder').on('change', function() {
+                var feeder = $(this).val();
+                $('#breaker').empty().append('<option value="">-- Select Breaker --</option>');
+
+                if (feeder && window.mockApiResponses['/api/breakers'][feeder]) {
+                    window.mockApiResponses['/api/breakers'][feeder].forEach(function(item) {
+                        $('#breaker').append('<option value="' + item.id + '">' + item.name + '</option>');
+                    });
+                }
+            });
+
+            formRuntime.$form.on('submit', function(e) {
+                e.preventDefault();
+                alert('Selected: ' + JSON.stringify(formRuntime.getValue(true), null, 2));
+            });
+
+            console.log('Cascade demo initialized (using mock data)');
+        });
+    </script>
+</body>
+</html>

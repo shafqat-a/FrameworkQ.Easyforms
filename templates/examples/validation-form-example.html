@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Validation Example - HTMLDSL</title>
+    <link rel="stylesheet" href="../../frontend/src/css/forms.css">
+</head>
+<body>
+    <h1>Form Validation Demo</h1>
+
+    <form data-form="validation-demo" data-title="Validation Demo" data-version="1.0">
+        <section data-page id="page-1">
+
+            <section data-section id="basic-validation">
+                <h3>Basic Validation</h3>
+
+                <div>
+                    <label for="name">Name * (required)</label>
+                    <input id="name" name="name" type="text" required
+                           data-error-required="Please enter your name">
+                </div>
+
+                <div>
+                    <label for="email">Email * (pattern validation)</label>
+                    <input id="email" name="email" type="email" required
+                           pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                           data-error-pattern="Please enter a valid email address">
+                </div>
+
+                <div>
+                    <label for="age">Age * (min/max validation)</label>
+                    <input id="age" name="age" type="number" required
+                           min="18" max="120"
+                           data-error-min="Must be at least 18 years old"
+                           data-error-max="Please enter a valid age">
+                </div>
+            </section>
+
+            <section data-section id="conditional-validation">
+                <h3>Conditional Validation</h3>
+
+                <div>
+                    <label for="has_vehicle">Do you own a vehicle?</label>
+                    <select id="has_vehicle" name="has_vehicle">
+                        <option value="">-- Select --</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+
+                <!-- Conditional field: only show if has_vehicle == 'yes' -->
+                <div data-when="has_vehicle == 'yes'">
+                    <label for="vehicle_type">Vehicle Type * (conditional required)</label>
+                    <input id="vehicle_type" name="vehicle_type" type="text"
+                           data-required-when="has_vehicle == 'yes'"
+                           data-error-required="Vehicle type is required when you own a vehicle">
+                </div>
+
+                <div data-when="has_vehicle == 'yes'">
+                    <label for="license_plate">License Plate</label>
+                    <input id="license_plate" name="license_plate" type="text"
+                           pattern="^[A-Z]{2}-\d{2}-[A-Z]{2}$"
+                           data-error-pattern="Format: AB-12-CD">
+                </div>
+            </section>
+
+            <section data-section id="cross-field-validation">
+                <h3>Cross-Field Validation</h3>
+
+                <div data-constraint="password == confirm_password"
+                     data-constraint-message="Passwords must match">
+
+                    <div>
+                        <label for="password">Password *</label>
+                        <input id="password" name="password" type="password" required
+                               minlength="8">
+                    </div>
+
+                    <div>
+                        <label for="confirm_password">Confirm Password *</label>
+                        <input id="confirm_password" name="confirm_password" type="password" required
+                               minlength="8">
+                    </div>
+                </div>
+            </section>
+
+        </section>
+
+        <button type="submit">Submit Form</button>
+    </form>
+
+    <div data-error-summary style="display: none;"></div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../../frontend/src/js/expression-evaluator.js"></script>
+    <script src="../../frontend/src/js/validation.js"></script>
+    <script src="../../frontend/src/js/formruntime.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var formRuntime = FormRuntimeHTMLDSL.mount('form[data-form]', {
+                validateOn: 'blur',
+                showInlineErrors: true,
+                showErrorSummary: true,
+                debug: true
+            });
+
+            // Validation event
+            formRuntime.$form.on('formdsl:validation', function(e, result) {
+                if (!result.valid) {
+                    console.log('Validation failed:', result.errors);
+                } else {
+                    console.log('Validation passed!');
+                }
+            });
+
+            // Submit handler
+            formRuntime.$form.on('submit', function(e) {
+                e.preventDefault();
+
+                var result = formRuntime.validate();
+                if (result.valid) {
+                    alert('Form is valid! Data: ' + JSON.stringify(formRuntime.getValue(true), null, 2));
+                } else {
+                    alert('Form has errors. Please correct them.');
+                }
+            });
+
+            console.log('Validation demo initialized');
+        });
+    </script>
+</body>
+</html>
