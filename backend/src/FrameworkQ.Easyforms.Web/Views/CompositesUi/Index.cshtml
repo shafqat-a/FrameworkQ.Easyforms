@@ -1,0 +1,19 @@
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Composite Widgets";
+}
+
+<div class="card">
+    <h2>Composite Widgets Demos</h2>
+    <ul>
+        <li><a href="/ui/composites/basic">Basic</a> — simple property binding</li>
+        <li><a href="/ui/composites/events">Events</a> — map DOM events to composite events</li>
+        <li><a href="/ui/composites/designer-runtime">Designer vs Runtime</a> — separate views</li>
+        <li><a href="/ui/composites/state">State</a> — save/restore JSON state</li>
+        <li><a href="/ui/composites/smart-table">SmartTable</a> — dynamic rows/cols with row/col spans</li>
+    </ul>
+    <p class="muted">All demos run completely client-side using the runtime scripts.</p>
+    <p class="muted">Use form submission to see how composite state is included in JSON as <code>_composites</code>.</p>
+    <p><a class="btn btn-primary" href="/ui/forms/upload">Upload a form</a></p>
+    
+</div>

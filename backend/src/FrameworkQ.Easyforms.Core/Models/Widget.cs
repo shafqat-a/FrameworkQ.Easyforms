@@ -16,6 +16,7 @@ public enum WidgetType
     Group,
     Table,
     Grid,
+    Composite,
     Checklist,
     Signature,
     FormHeader,

@@ -15,12 +15,16 @@ public class DatabaseController : ControllerBase
 {
     private readonly ILogger<DatabaseController> _logger;
     private readonly IConfiguration _configuration;
+    private readonly FrameworkQ.Easyforms.Api.Storage.IFormStore _formStore;
+    private readonly FrameworkQ.Easyforms.Core.Interfaces.IFormParser _formParser;
 
     // TODO: Inject via DI once services registered
-    public DatabaseController(ILogger<DatabaseController> logger, IConfiguration configuration)
+    public DatabaseController(ILogger<DatabaseController> logger, IConfiguration configuration, FrameworkQ.Easyforms.Api.Storage.IFormStore formStore, FrameworkQ.Easyforms.Core.Interfaces.IFormParser formParser)
     {
         _logger = logger;
         _configuration = configuration;
+        _formStore = formStore;
+        _formParser = formParser;
     }
 
     /// <summary>
@@ -36,7 +40,7 @@ public class DatabaseController : ControllerBase
         {
             // Get form definition (from in-memory storage for now)
             // TODO: Get from database once persistence implemented
-            var formDef = GetFormDefinition(request.FormId);
+            var formDef = await GetFormDefinitionAsync(request.FormId);
             if (formDef == null)
             {
                 return NotFound(new { error = new { code = "NOT_FOUND", message = $"Form '{request.FormId}' not found" } });
@@ -138,11 +142,18 @@ public class DatabaseController : ControllerBase
         }
     }
 
-    private FormDefinition? GetFormDefinition(string formId)
+    private async Task<FormDefinition?> GetFormDefinitionAsync(string formId)
     {
-        // TODO: Get from database
-        // For now, get from FormsController static storage via reflection or DI
-        return null;
+        var html = await _formStore.GetHtmlAsync(formId);
+        if (html == null) return null;
+        try
+        {
+            return await _formParser.ParseAsync(html);
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private string GetConnectionString(string provider)

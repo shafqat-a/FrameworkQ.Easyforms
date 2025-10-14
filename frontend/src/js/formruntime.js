@@ -57,6 +57,9 @@
             // Initialize validation (US3)
             this._initValidation();
 
+            // Initialize composite widgets (custom controls)
+            this._initComposites();
+
             // Initialize conditional visibility (US3)
             this._initConditionalVisibility();
 
@@ -128,6 +131,14 @@
                 }
             });
 
+            // Composite widget state
+            if (window.CompositeWidgets) {
+                var cstate = window.CompositeWidgets.getState(this.$form);
+                if (Object.keys(cstate).length > 0) {
+                    data._composites = cstate;
+                }
+            }
+
             this._log('getValue() called', data);
             return data;
         },
@@ -164,6 +175,11 @@
                     $field.trigger('change');
                 }
             });
+
+            // Restore composite state if present
+            if (data._composites && window.CompositeWidgets) {
+                window.CompositeWidgets.setState(self.$form, data._composites);
+            }
         },
 
         /**
@@ -404,6 +420,16 @@
                     fetchTimeout: this.options.fetchTimeout,
                     fetchRetries: this.options.fetchRetries
                 });
+            }
+        },
+
+        /**
+         * Initialize composite widget registry and render instances
+         * @private
+         */
+        _initComposites: function() {
+            if (window.CompositeWidgets) {
+                window.CompositeWidgets.initialize(this.$form);
             }
         },
 

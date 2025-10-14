@@ -1,0 +1,22 @@
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Composite - SmartTable";
+}
+
+<div class="card">
+    <h2>Composite - SmartTable</h2>
+    <p class="muted">Properties: <code>rows</code>, <code>columns</code>, <code>addrowhtmltemplate</code>. Row objects can have <code>rowspan</code>. Column objects can have <code>colspan</code>.</p>
+    <form data-form="comp-smart-table" data-title="SmartTable Demo" data-version="1.0">
+        <section data-section id="sec" data-title="Demo">
+            <div>
+                <div data-composite="smart-table" id="st1"
+                     data-prop-rows='[{"label":"Group A","rowspan":2},{"label":""},{"label":"Group B","rowspan":2},{"label":""}]'
+                     data-prop-columns='[{"header":"Group","key":"group"},{"header":"M1","key":"m1"},{"header":"M2","key":"m2","colspan":2}]'
+                     data-prop-addrowhtmltemplate='<tr><td>New</td><td colspan="3"><input type="text" placeholder="Details"/></td></tr>'>
+                </div>
+            </div>
+        </section>
+    </form>
+</div>
+
+<script>$(function(){ FormRuntimeHTMLDSL.mount('form[data-form]'); });</script>

@@ -1,0 +1,26 @@
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Create Submission";
+    var formsJson = ViewData["FormsListJson"] as string ?? "{\"data\":[]}";
+}
+
+<div class="card">
+    <h2>Create Submission</h2>
+    <div style="margin:10px 0;">
+        <label for="formSelect">Choose Form</label>
+        <select id="formSelect" style="min-width:300px;"></select>
+        <button id="openBtn" class="btn btn-primary" style="margin-left:8px;">Open Form</button>
+    </div>
+</div>
+
+<script>
+    (function(){
+        var parsed = @Html.Raw(formsJson);
+        var forms = parsed.data || [];
+        var $sel = $('#formSelect');
+        $sel.append('<option value="">-- Select Form --</option>');
+        forms.forEach(function(f){ $sel.append('<option value="'+f.id+'">'+f.id+' — '+(f.title||'')+'</option>'); });
+        $('#openBtn').on('click', function(){ var id=$sel.val(); if (!id){ alert('Please select a form.'); return; } window.location.href = '/ui/forms/' + id + '/preview'; });
+    })();
+</script>
+

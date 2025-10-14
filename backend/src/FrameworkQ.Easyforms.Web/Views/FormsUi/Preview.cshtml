@@ -1,0 +1,70 @@
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Preview";
+    var formId = ViewData["FormId"] as string ?? "";
+    var formHtml = ViewData["FormHtml"] as string ?? "";
+    var apiBase = ViewData["ApiBaseForRuntime"] as string ?? "/ui-backend";
+}
+
+<div class="card">
+    <h2>Form Preview - @formId</h2>
+    <div data-error-summary style="display:none;"></div>
+    <div id="form-container">
+        @Html.Raw(formHtml)
+    </div>
+    <div style="margin-top:10px; display:flex; gap:8px;">
+        <button type="button" id="btnSaveDraft" class="btn btn-secondary">Save Draft</button>
+        <button type="button" id="btnSaveComposites" class="btn btn-secondary" disabled>Save Composite State (to draft)</button>
+    </div>
+    <div id="saveStatus" class="muted" style="margin-top:6px;"></div>
+</div>
+
+<script>
+    $(function(){
+        try {
+            // Mount runtime on the loaded form using same-origin proxy
+            var runtime = window.FormRuntimeHTMLDSL.mount($('#form-container').find('form[data-form]'), {
+                apiBaseUrl: '@apiBase',
+                validateOn: 'change',
+                showInlineErrors: true,
+                showErrorSummary: true,
+                debug: true
+            });
+
+            // Handle submit inside the form
+            runtime.$form.on('submit', function(e){
+                e.preventDefault();
+                runtime.submit({ status: 'submitted' })
+                    .done(function(r){ alert('Submitted! InstanceId: ' + r.instanceId); })
+                    .fail(function(xhr){ alert('Submit failed: ' + (xhr.responseText || '')); });
+            });
+
+            var lastInstanceId = null;
+            $('#btnSaveDraft').on('click', function(){
+                runtime.saveDraft()
+                    .done(function(r){ lastInstanceId = r.instanceId; $('#btnSaveComposites').prop('disabled', false); $('#saveStatus').text('Draft saved: ' + lastInstanceId); })
+                    .fail(function(xhr){ var err = xhr.responseJSON || {}; alert('Failed to save draft: ' + (err.message||'')); });
+            });
+
+            $('#btnSaveComposites').on('click', function(){
+                if (!lastInstanceId){ alert('Save a draft first.'); return; }
+                var st = window.CompositeWidgets ? window.CompositeWidgets.getState(runtime.$form) : {};
+                $.ajax({ url: '/ui-backend/v1/submissions/' + lastInstanceId + '/composites', method: 'PUT', contentType: 'application/json', data: JSON.stringify(st) })
+                  .done(function(){ $('#saveStatus').text('Composite state saved for draft: ' + lastInstanceId); })
+                  .fail(function(xhr){ alert('Failed to save composite state: ' + (xhr.responseText||'')); });
+            });
+
+            // If instanceId provided in query, restore composite state
+            var qs = new URLSearchParams(window.location.search);
+            var sid = qs.get('instanceId');
+            var restore = (qs.get('restore')||'').toLowerCase();
+            if (sid && restore.indexOf('composite') !== -1) {
+                $.getJSON('/ui-backend/v1/submissions/' + sid)
+                  .done(function(sub){ if (sub && sub.compositeState && window.CompositeWidgets){ window.CompositeWidgets.setState(runtime.$form, sub.compositeState); $('#saveStatus').text('Composite state restored from submission: ' + sid); } })
+                  .fail(function(){ console.warn('Could not load submission to restore composites'); });
+            }
+        } catch (e) {
+            console.error('Preview init failed', e);
+        }
+    });
+</script>

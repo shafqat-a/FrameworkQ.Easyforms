@@ -214,6 +214,22 @@ public class HtmlParser : IFormParser
             }
         }
 
+        // Parse composite widgets (custom controls)
+        var compositeElements = containerElement.QuerySelectorAll("[data-composite]");
+        foreach (var comp in compositeElements)
+        {
+            if (IsInsideWidget(comp, containerElement))
+            {
+                continue;
+            }
+
+            var composite = ParseComposite(comp);
+            if (composite != null)
+            {
+                widgets.Add(composite);
+            }
+        }
+
         // TODO: Parse other widget types in subsequent user stories
         // - Signature (US6)
         // - Checklist, RadioGroup, CheckboxGroup, etc.
@@ -228,7 +244,8 @@ public class HtmlParser : IFormParser
         {
             if (parent.HasAttribute("data-group") ||
                 parent.HasAttribute("data-table") ||
-                parent.HasAttribute("data-grid"))
+                parent.HasAttribute("data-grid") ||
+                parent.HasAttribute("data-composite"))
             {
                 return true;
             }
@@ -240,5 +257,39 @@ public class HtmlParser : IFormParser
     private static string? GetAttributeValue(IElement element, string attributeName)
     {
         return element.GetAttribute(attributeName);
+    }
+
+    private FrameworkQ.Easyforms.Core.Models.CompositeWidget? ParseComposite(IElement element)
+    {
+        var name = GetAttributeValue(element, "data-composite");
+        if (string.IsNullOrWhiteSpace(name)) return null;
+
+        var composite = new FrameworkQ.Easyforms.Core.Models.CompositeWidget
+        {
+            Id = element.GetAttribute("id") ?? $"comp-{Guid.NewGuid().ToString("N")[..8]}",
+            Name = name,
+            IsContainer = (GetAttributeValue(element, "data-container") == "true"),
+            When = GetAttributeValue(element, "data-when")
+        };
+
+        // Collect data-prop-* attributes
+        foreach (var attr in element.Attributes)
+        {
+            var aname = attr.Name.ToLower();
+            if (aname.StartsWith("data-prop-"))
+            {
+                var propName = aname.Substring("data-prop-".Length);
+                composite.Properties[propName] = attr.Value;
+            }
+        }
+
+        // If container, we could parse child widgets within, but often the runtime expands the template.
+        // To avoid double parsing, only parse direct children if explicit flag set
+        if (composite.IsContainer && element.HasAttribute("data-parse-children"))
+        {
+            composite.Children = ParseWidgets(element);
+        }
+
+        return composite;
     }
 }

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Composite Designer vs Runtime</title>
+  <link rel="stylesheet" href="../../frontend/src/css/forms.css">
+</head>
+<body>
+  <form data-form="comp-views" data-title="Composite Views" data-version="1.0">
+    <!-- Definition: card with different designer/runtime -->
+    <div data-composite-def="info-card" hidden>
+      <div data-designer>
+        <div style="padding:8px;border:1px dashed #999;color:#666;">[Designer] Info Card — Title: {{prop:title}}</div>
+      </div>
+      <div data-runtime>
+        <div style="padding:12px;border:1px solid #333;border-radius:6px;background:#f9f9f9;">
+          <h4 style="margin:0 0 6px 0;" data-prop-bind="title">{{prop:title}}</h4>
+          <div data-prop-bind="content">{{prop:content}}</div>
+        </div>
+      </div>
+    </div>
+
+    <section data-section id="sec" data-title="Views">
+      <div data-group data-layout="columns:2">
+        <div>
+          <label>Designer</label>
+          <div data-composite="info-card" id="card1" data-view="designer" data-prop-title="Sample Card" data-prop-content="Lorem ipsum"></div>
+        </div>
+        <div>
+          <label>Runtime</label>
+          <div data-composite="info-card" id="card2" data-prop-title="Sample Card" data-prop-content="Lorem ipsum"></div>
+        </div>
+      </div>
+    </section>
+  </form>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="../../frontend/src/js/composites.js"></script>
+  <script src="../../frontend/src/js/expression-evaluator.js"></script>
+  <script src="../../frontend/src/js/validation.js"></script>
+  <script src="../../frontend/src/js/table-manager.js"></script>
+  <script src="../../frontend/src/js/widgets/table.js"></script>
+  <script src="../../frontend/src/js/data-fetch.js"></script>
+  <script src="../../frontend/src/js/formruntime.js"></script>
+  <script>$(function(){ FormRuntimeHTMLDSL.mount('form[data-form]'); });</script>
+</body>
+</html>
+

@@ -1,0 +1,35 @@
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Database Generation";
+    var responseJson = ViewData["ResponseJson"] as string;
+}
+
+<div class="card">
+    <h2>Generate Database DDL</h2>
+    <form method="post" action="/ui/database/generate">
+        <div style="margin:10px 0;">
+            <label>Form ID</label>
+            <input type="text" name="formId" placeholder="e.g., performance-log" style="width:300px;" />
+        </div>
+        <div style="margin:10px 0;">
+            <label>Provider</label>
+            <select name="provider">
+                <option value="sqlserver">SQL Server</option>
+                <option value="postgresql">PostgreSQL</option>
+            </select>
+        </div>
+        <div style="margin:10px 0;">
+            <label><input type="checkbox" name="dryRun" value="true" checked /> Dry Run</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Generate</button>
+    </form>
+</div>
+
+@if (!string.IsNullOrEmpty(responseJson))
+{
+    <div class="card">
+        <h3>Response</h3>
+        <pre>@responseJson</pre>
+    </div>
+}
+

@@ -1,0 +1,47 @@
+@* Global composite definitions available to all pages *@
+<div id="global-composites" hidden style="display:none;">
+    <!-- Meter badge -->
+    <div data-composite-def="meter-badge" hidden>
+      <div data-runtime>
+        <div class="meter" style="padding:8px;border:1px solid #ddd;border-radius:4px;display:inline-block;">
+          <strong data-prop-bind="title">{{prop:title}}</strong>
+          <span style="color:#666; margin-left:6px;">(<span data-prop-bind="unit">{{prop:unit}}</span>)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Counter block -->
+    <div data-composite-def="counter-block" hidden>
+      <div data-runtime>
+        <div class="counter" style="display:flex;align-items:center;gap:6px;">
+          <button type="button" class="btn-dec">-</button>
+          <input type="number" class="val" value="0" style="width:80px;">
+          <button type="button" class="btn-inc">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info card (designer/runtime) -->
+    <div data-composite-def="info-card" hidden>
+      <div data-designer>
+        <div style="padding:8px;border:1px dashed #999;color:#666;">[Designer] Info Card — Title: {{prop:title}}</div>
+      </div>
+      <div data-runtime>
+        <div style="padding:12px;border:1px solid #333;border-radius:6px;background:#f9f9f9;">
+          <h4 style="margin:0 0 6px 0;" data-prop-bind="title">{{prop:title}}</h4>
+          <div data-prop-bind="content">{{prop:content}}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Note editor (state keys) -->
+    <div data-composite-def="note-editor" hidden>
+      <div data-runtime>
+        <div>
+          <input type="text" placeholder="Title" data-state-key="title" style="width: 100%; margin-bottom:6px;" />
+          <textarea placeholder="Note" rows="3" data-state-key="note" style="width:100%;"></textarea>
+        </div>
+      </div>
+    </div>
+</div>
+

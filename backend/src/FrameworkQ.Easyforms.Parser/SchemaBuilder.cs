@@ -159,6 +159,20 @@ public class SchemaBuilder : ISchemaExtractor
                     when = grid.When
                 }
             },
+            CompositeWidget comp => new
+            {
+                type = "composite",
+                id = comp.Id,
+                composite = new
+                {
+                    name = comp.Name,
+                    properties = comp.Properties,
+                    isContainer = comp.IsContainer,
+                    when = comp.When,
+                    // children serialized if parsed
+                    children = comp.Children.Select(SerializeWidget)
+                }
+            },
             _ => new { type = widget.Type.ToString().ToLower(), id = widget.Id }
         };
     }

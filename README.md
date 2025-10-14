@@ -34,7 +34,7 @@ cd src/FrameworkQ.Easyforms.Api
 dotnet run
 ```
 
-API starts at: `http://localhost:5000`
+API starts at: `http://localhost:4000`
 
 ### 2. Create Your First Form
 
@@ -55,14 +55,14 @@ Create an HTML file with data-* annotations:
 ### 3. Upload Form
 
 ```bash
-curl -X POST http://localhost:5000/v1/forms \
+curl -X POST http://localhost:4000/v1/forms \
   -F "htmlFile=@my-form.html"
 ```
 
 ### 4. View Extracted Schema
 
 ```bash
-curl http://localhost:5000/v1/forms/my-form/schema | jq
+curl http://localhost:4000/v1/forms/my-form/schema | jq
 ```
 
 ## Architecture

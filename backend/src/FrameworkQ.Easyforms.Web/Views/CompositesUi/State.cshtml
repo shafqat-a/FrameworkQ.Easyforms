@@ -1,0 +1,44 @@
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Composite - State";
+}
+
+<div class="card">
+    <h2>Composite - State</h2>
+    <form data-form="comp-state" data-title="Composite State" data-version="1.0">
+        <div data-composite-def="note-editor" hidden>
+            <div data-runtime>
+                <div>
+                    <input type="text" placeholder="Title" data-state-key="title" style="width: 100%; margin-bottom:6px;" />
+                    <textarea placeholder="Note" rows="3" data-state-key="note" style="width:100%;"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <section data-section id="sec" data-title="Editor">
+            <div data-composite="note-editor" id="ed1"></div>
+            <div style="margin-top:8px;">
+                <button type="button" id="saveState" class="btn btn-secondary">Save State</button>
+                <button type="button" id="restoreState" class="btn btn-secondary">Restore State</button>
+            </div>
+            <div style="margin-top:8px;">
+                <label>State JSON</label>
+                <textarea id="stateJson" rows="6" style="width:100%;"></textarea>
+            </div>
+        </section>
+    </form>
+</div>
+
+<script>
+    $(function(){
+      var rt = FormRuntimeHTMLDSL.mount('form[data-form]');
+      $('#saveState').on('click', function(){
+        var st = window.CompositeWidgets.getState(rt.$form);
+        $('#stateJson').val(JSON.stringify(st, null, 2));
+      });
+      $('#restoreState').on('click', function(){
+        try { var obj = JSON.parse($('#stateJson').val()||'{}'); window.CompositeWidgets.setState(rt.$form, obj); } catch(e){ alert('Invalid JSON'); }
+      });
+    });
+  </script>
+

@@ -11,12 +11,12 @@ using FrameworkQ.Easyforms.Runtime;
 public class QueryController : ControllerBase
 {
     private readonly ILogger<QueryController> _logger;
-    private readonly SubmissionProcessor _processor;
+    private readonly FrameworkQ.Easyforms.Api.Storage.ISubmissionStore _submissionStore;
 
-    public QueryController(ILogger<QueryController> logger)
+    public QueryController(ILogger<QueryController> logger, FrameworkQ.Easyforms.Api.Storage.ISubmissionStore submissionStore)
     {
         _logger = logger;
-        _processor = new SubmissionProcessor();
+        _submissionStore = submissionStore;
     }
 
     /// <summary>
@@ -24,7 +24,7 @@ public class QueryController : ControllerBase
     /// GET /v1/query/submissions
     /// </summary>
     [HttpGet("submissions")]
-    public IActionResult QuerySubmissions(
+    public async Task<IActionResult> QuerySubmissions(
         [FromQuery] string? formId,
         [FromQuery] string? status,
         [FromQuery] string? submittedBy,
@@ -37,7 +37,7 @@ public class QueryController : ControllerBase
 
         try
         {
-            var submissions = _processor.QuerySubmissions(formId, status, submittedBy);
+            var submissions = await _submissionStore.QueryAsync(formId, status, submittedBy);
 
             // Date filtering
             if (fromDate.HasValue)

@@ -15,15 +15,18 @@ public class FormsController : ControllerBase
     private readonly ILogger<FormsController> _logger;
     private readonly IFormParser _formParser;
     private readonly ISchemaExtractor _schemaExtractor;
+    private readonly FrameworkQ.Easyforms.Api.Storage.IFormStore _formStore;
 
-    // In-memory storage for demo (TODO: Replace with database in US4)
-    private static readonly Dictionary<string, FormDefinition> _forms = new();
-
-    public FormsController(ILogger<FormsController> logger)
+    public FormsController(
+        ILogger<FormsController> logger,
+        IFormParser formParser,
+        ISchemaExtractor schemaExtractor,
+        FrameworkQ.Easyforms.Api.Storage.IFormStore formStore)
     {
         _logger = logger;
-        _formParser = new HtmlParser();
-        _schemaExtractor = new SchemaBuilder();
+        _formParser = formParser;
+        _schemaExtractor = schemaExtractor;
+        _formStore = formStore;
     }
 
     /// <summary>
@@ -57,8 +60,21 @@ public class FormsController : ControllerBase
             // Extract schema
             formDef.SchemaJson = await _schemaExtractor.ExtractSchemaAsync(formDef);
 
-            // Store form (in-memory for now)
-            _forms[formDef.Id] = formDef;
+            // Persist form (file-backed store)
+            await _formStore.SaveAsync(
+                formDef.Id,
+                formDef.HtmlSource,
+                formDef.SchemaJson,
+                new FrameworkQ.Easyforms.Api.Storage.FormMeta
+                {
+                    Id = formDef.Id,
+                    Title = formDef.Title,
+                    Version = formDef.Version,
+                    Tags = formDef.Tags,
+                    CreatedAt = formDef.CreatedAt,
+                    UpdatedAt = formDef.UpdatedAt
+                }
+            );
 
             _logger.LogInformation("Form uploaded successfully: {FormId} v{Version}", formDef.Id, formDef.Version);
 
@@ -95,33 +111,27 @@ public class FormsController : ControllerBase
     /// GET /v1/forms/{formId}
     /// </summary>
     [HttpGet("{formId}")]
-    public IActionResult GetForm(string formId, [FromQuery] string? version = null)
+    public async Task<IActionResult> GetForm(string formId, [FromQuery] string? version = null)
     {
         _logger.LogInformation("Retrieving form: {FormId}", formId);
 
-        if (!_forms.TryGetValue(formId, out var formDef))
+        var meta = await _formStore.GetMetaAsync(formId);
+        var schema = await _formStore.GetSchemaAsync(formId);
+        if (meta == null || schema == null)
         {
-            return NotFound(new
-            {
-                error = new
-                {
-                    code = "NOT_FOUND",
-                    message = $"Form '{formId}' not found"
-                }
-            });
+            return NotFound(new { error = new { code = "NOT_FOUND", message = $"Form '{formId}' not found" } });
         }
-
         return Ok(new
         {
-            id = formDef.Id,
-            title = formDef.Title,
-            version = formDef.Version,
-            locales = formDef.Locales,
-            storageMode = formDef.StorageMode,
-            tags = formDef.Tags,
-            createdAt = formDef.CreatedAt,
-            updatedAt = formDef.UpdatedAt,
-            schema = System.Text.Json.JsonDocument.Parse(formDef.SchemaJson)
+            id = meta.Id,
+            title = meta.Title,
+            version = meta.Version,
+            locales = Array.Empty<string>(),
+            storageMode = "jsonb",
+            tags = meta.Tags,
+            createdAt = meta.CreatedAt,
+            updatedAt = meta.UpdatedAt,
+            schema = System.Text.Json.JsonDocument.Parse(schema)
         });
     }
 
@@ -130,23 +140,16 @@ public class FormsController : ControllerBase
     /// GET /v1/forms/{formId}/schema
     /// </summary>
     [HttpGet("{formId}/schema")]
-    public IActionResult GetSchema(string formId, [FromQuery] string? version = null)
+    public async Task<IActionResult> GetSchema(string formId, [FromQuery] string? version = null)
     {
         _logger.LogInformation("Retrieving schema for form: {FormId}", formId);
 
-        if (!_forms.TryGetValue(formId, out var formDef))
+        var schema = await _formStore.GetSchemaAsync(formId);
+        if (schema == null)
         {
-            return NotFound(new
-            {
-                error = new
-                {
-                    code = "NOT_FOUND",
-                    message = $"Form '{formId}' not found"
-                }
-            });
+            return NotFound(new { error = new { code = "NOT_FOUND", message = $"Form '{formId}' not found" } });
         }
-
-        return Content(formDef.SchemaJson, "application/json");
+        return Content(schema, "application/json");
     }
 
     /// <summary>
@@ -154,23 +157,16 @@ public class FormsController : ControllerBase
     /// GET /v1/forms/{formId}/html
     /// </summary>
     [HttpGet("{formId}/html")]
-    public IActionResult GetHtml(string formId, [FromQuery] string? version = null)
+    public async Task<IActionResult> GetHtml(string formId, [FromQuery] string? version = null)
     {
         _logger.LogInformation("Retrieving HTML for form: {FormId}", formId);
 
-        if (!_forms.TryGetValue(formId, out var formDef))
+        var html = await _formStore.GetHtmlAsync(formId);
+        if (html == null)
         {
-            return NotFound(new
-            {
-                error = new
-                {
-                    code = "NOT_FOUND",
-                    message = $"Form '{formId}' not found"
-                }
-            });
+            return NotFound(new { error = new { code = "NOT_FOUND", message = $"Form '{formId}' not found" } });
         }
-
-        return Content(formDef.HtmlSource, "text/html");
+        return Content(html, "text/html");
     }
 
     /// <summary>
@@ -178,32 +174,18 @@ public class FormsController : ControllerBase
     /// GET /v1/forms
     /// </summary>
     [HttpGet]
-    public IActionResult ListForms([FromQuery] string? tags = null)
+    public async Task<IActionResult> ListForms([FromQuery] string? tags = null)
     {
-        var forms = _forms.Values.AsEnumerable();
-
+        var all = await _formStore.ListAsync();
         if (!string.IsNullOrEmpty(tags))
         {
             var tagList = tags.Split(',', StringSplitOptions.RemoveEmptyEntries);
-            forms = forms.Where(f => f.Tags.Intersect(tagList).Any());
+            all = all.Where(f => f.Tags.Intersect(tagList).Any()).ToList();
         }
-
         return Ok(new
         {
-            data = forms.Select(f => new
-            {
-                id = f.Id,
-                title = f.Title,
-                version = f.Version,
-                tags = f.Tags,
-                updatedAt = f.UpdatedAt
-            }),
-            pagination = new
-            {
-                page = 1,
-                limit = 100,
-                total = forms.Count()
-            }
+            data = all.Select(f => new { id = f.Id, title = f.Title, version = f.Version, tags = f.Tags, updatedAt = f.UpdatedAt }),
+            pagination = new { page = 1, limit = 100, total = all.Count }
         });
     }
 }

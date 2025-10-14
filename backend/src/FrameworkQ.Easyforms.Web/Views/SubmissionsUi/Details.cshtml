@@ -1,0 +1,32 @@
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Submission Details";
+    var json = ViewData["SubmissionJson"] as string ?? "{}";
+}
+
+<div class="card">
+    <h2>Submission</h2>
+    <div id="meta"></div>
+    <div style="margin-top:8px;">
+        <a id="previewBtn" class="btn btn-primary" href="#">Open Preview (restore composites)</a>
+    </div>
+    <h3 style="margin-top:16px;">Composite State</h3>
+    <pre id="cstate"></pre>
+    <h3>Raw</h3>
+    <pre id="raw"></pre>
+</div>
+
+<script>
+    (function(){
+        var obj = @Html.Raw(json);
+        $('#raw').text(JSON.stringify(obj, null, 2));
+        var metaHtml = 'Instance: ' + obj.instanceId + '<br>'
+            + 'Form: ' + obj.formId + ' v' + obj.formVersion + '<br>'
+            + 'Submitted: ' + obj.submittedAt + '<br>'
+            + 'Status: ' + obj.status;
+        $('#meta').html(metaHtml);
+        $('#cstate').text(JSON.stringify(obj.compositeState || {}, null, 2));
+        var href = '/ui/forms/' + obj.formId + '/preview?instanceId=' + obj.instanceId + '&restore=composites';
+        $('#previewBtn').attr('href', href);
+    })();
+</script>

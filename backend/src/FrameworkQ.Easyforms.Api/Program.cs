@@ -44,9 +44,15 @@ builder.Services.AddCors(options =>
 // Add HTTP context accessor
 builder.Services.AddHttpContextAccessor();
 
-// TODO: Register services (IFormParser, IDatabaseProvider, etc.)
-// builder.Services.AddScoped<IFormParser, HtmlParser>();
-// builder.Services.AddScoped<IDatabaseProvider, SqlServerProvider>();
+// Storage root
+var dataRoot = Path.Combine(AppContext.BaseDirectory, "App_Data");
+Directory.CreateDirectory(dataRoot);
+
+// Register services (parser, schema, stores)
+builder.Services.AddSingleton<FrameworkQ.Easyforms.Core.Interfaces.IFormParser, FrameworkQ.Easyforms.Parser.HtmlParser>();
+builder.Services.AddSingleton<FrameworkQ.Easyforms.Core.Interfaces.ISchemaExtractor, FrameworkQ.Easyforms.Parser.SchemaBuilder>();
+builder.Services.AddSingleton<FrameworkQ.Easyforms.Api.Storage.IFormStore>(sp => new FrameworkQ.Easyforms.Api.Storage.FileFormStore(dataRoot));
+builder.Services.AddSingleton<FrameworkQ.Easyforms.Api.Storage.ISubmissionStore>(sp => new FrameworkQ.Easyforms.Api.Storage.FileSubmissionStore(dataRoot));
 
 var app = builder.Build();
 

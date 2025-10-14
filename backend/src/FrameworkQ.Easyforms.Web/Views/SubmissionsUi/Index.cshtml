@@ -1,0 +1,42 @@
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Submissions";
+    var submissionsJson = ViewData["SubmissionsJson"] as string ?? "[]";
+}
+
+<div class="card">
+    <h2>Submissions</h2>
+    <table style="width:100%; border-collapse:collapse;">
+        <thead>
+            <tr>
+                <th style="text-align:left; border-bottom:1px solid #ccc; padding:6px;">Instance</th>
+                <th style="text-align:left; border-bottom:1px solid #ccc; padding:6px;">Form</th>
+                <th style="text-align:left; border-bottom:1px solid #ccc; padding:6px;">Version</th>
+                <th style="text-align:left; border-bottom:1px solid #ccc; padding:6px;">Submitted</th>
+                <th style="text-align:left; border-bottom:1px solid #ccc; padding:6px;">Status</th>
+                <th style="text-align:left; border-bottom:1px solid #ccc; padding:6px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="submissions-body"></tbody>
+    </table>
+</div>
+
+<script>
+    (function(){
+        var rows = @Html.Raw(submissionsJson);
+        var $tbody = $('#submissions-body');
+        rows.forEach(function(s){
+            var tr = $('<tr/>');
+            tr.append('<td style="padding:6px;border-bottom:1px solid #eee;">'+ s.instanceId +'</td>');
+            tr.append('<td style="padding:6px;border-bottom:1px solid #eee;">'+ (s.formId||'') +'</td>');
+            tr.append('<td style="padding:6px;border-bottom:1px solid #eee;">'+ (s.formVersion||'') +'</td>');
+            tr.append('<td style="padding:6px;border-bottom:1px solid #eee;">'+ (s.submittedAt||'') +'</td>');
+            tr.append('<td style="padding:6px;border-bottom:1px solid #eee;">'+ (s.status||'') +'</td>');
+            tr.append('<td style="padding:6px;border-bottom:1px solid #eee;">'
+                + '<a href="/ui/submissions/'+ s.instanceId +'">View</a>'
+                + '</td>');
+            $tbody.append(tr);
+        });
+    })();
+</script>
+

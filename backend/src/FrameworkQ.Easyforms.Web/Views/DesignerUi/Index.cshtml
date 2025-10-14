@@ -1,0 +1,69 @@
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "HTML Form/Composite Designer";
+}
+
+<link rel="stylesheet" href="/css/designer.css" />
+
+<div class="designer">
+  <div class="designer__header">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="design">Designer</button>
+      <button class="tab-btn" data-tab="code">Code</button>
+      <button class="tab-btn" data-tab="preview">Preview</button>
+    </div>
+    <div class="designer__actions">
+      <button id="btnNew" class="btn btn-secondary">New</button>
+      <button id="btnDownload" class="btn btn-secondary">Download HTML</button>
+    </div>
+  </div>
+  <div class="designer__body">
+    <div class="designer__left">
+      <h4>Palette</h4>
+      <div class="palette" id="palette">
+        <div class="palette-item" draggable="true" data-template="<label>Label</label>">Label</div>
+        <div class="palette-item" draggable="true" data-template="<input type='text' name='text1' placeholder='Text' />">Text Input</div>
+        <div class="palette-item" draggable="true" data-template="<input type='number' name='number1' placeholder='0' />">Number Input</div>
+        <div class="palette-item" draggable="true" data-template="<select name='select1'><option value=''>-- Select --</option><option>One</option></select>">Select</div>
+        <div class="palette-item" draggable="true" data-template="<textarea name='notes' rows='3'></textarea>">Textarea</div>
+        <div class="palette-item" draggable="true" data-template="<div data-group data-layout='columns:2'></div>">Group (2 cols)</div>
+        <div class="palette-item" draggable="true" data-template="<section data-section id='section-1' data-title='Section'></section>">Section</div>
+        <div class="palette-item" draggable="true" data-template="<table data-table id='tbl1'><thead><tr><th data-col='col1'>Col 1</th><th data-col='col2'>Col 2</th></tr></thead><tbody><tr data-row-template><td><input name='col1'/></td><td><input name='col2'/></td></tr></tbody></table>">Table</div>
+        <div class="palette-item" draggable="true" data-composite="true">Composite...</div>
+      </div>
+      <h4 style="margin-top:16px;">Properties</h4>
+      <div class="props" id="props">
+        <div class="props__none">Select an element to edit its properties.</div>
+        <div class="props__grid" style="display:none;">
+          <div class="prop-row"><label>Tag</label><input id="propTag" readonly></div>
+          <div class="prop-row"><label>id</label><input id="propId"></div>
+          <div class="prop-row"><label>class</label><input id="propClass"></div>
+          <div class="prop-row"><label>name</label><input id="propName"></div>
+          <div class="prop-row"><label>style</label><input id="propStyle"></div>
+          <div class="prop-row"><label>text</label><input id="propText"></div>
+          <div class="prop-row"><label>type</label><input id="propType"></div>
+          <div class="prop-row"><label>required</label><input id="propRequired" type="checkbox"></div>
+          <div class="prop-row"><label>data-*</label><textarea id="propData" rows="6" placeholder="key=value per line (e.g., data-title=My Form)"></textarea></div>
+          <div class="prop-actions"><button id="btnApplyProps" class="btn btn-primary">Apply</button><button id="btnDelete" class="btn btn-secondary" style="margin-left:8px;">Delete Element</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="designer__center">
+      <div class="tab tab--design active" id="tab-design">
+        <div class="canvas-wrap">
+          <div class="hint">Drag controls here</div>
+          <div class="canvas" id="canvas" contenteditable="false"></div>
+        </div>
+      </div>
+      <div class="tab tab--code" id="tab-code">
+        <pre id="codeView" class="code"></pre>
+      </div>
+      <div class="tab tab--preview" id="tab-preview">
+        <div id="preview"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/designer.js"></script>
+

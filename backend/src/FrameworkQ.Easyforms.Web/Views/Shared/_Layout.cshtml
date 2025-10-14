@@ -1,0 +1,48 @@
+@{
+    var title = ViewData["Title"] as string ?? "FrameworkQ.Easyforms UI";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@title</title>
+    <link rel="stylesheet" href="/css/forms.css" />
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin:0; }
+        header { background: #263238; color: #fff; padding: 12px 20px; }
+        header a { color: #fff; margin-right: 16px; text-decoration: none; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .card { background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:16px;margin-bottom:16px;}
+        .muted { color:#666; font-size: 13px; }
+        pre { background:#f7f7f7; padding:12px; border-radius:4px; overflow:auto; }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/js/expression-evaluator.js"></script>
+    <script src="/js/validation.js"></script>
+    <script src="/js/table-manager.js"></script>
+    <script src="/js/widgets/table.js"></script>
+    <script src="/js/data-fetch.js"></script>
+    <script src="/js/composites.js"></script>
+    <script src="/js/composite-smart-table.js"></script>
+    <script src="/js/formruntime.js"></script>
+</head>
+<body>
+    @await Html.PartialAsync("_CompositeCatalog")
+    <header>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/ui/forms">Forms</a>
+            <a href="/ui/forms/upload">Upload Form</a>
+            <a href="/ui/database">Database</a>
+            <a href="/ui/submissions">Submissions</a>
+            <a href="/ui/submissions/create">Create Submission</a>
+            <a href="/ui/composites">Composites</a>
+            <a href="/ui/designer">Designer</a>
+        </nav>
+    </header>
+    <div class="container">
+        @RenderBody()
+    </div>
+</body>
+</html>

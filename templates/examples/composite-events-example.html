@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Composite Events Example</title>
+  <link rel="stylesheet" href="../../frontend/src/css/forms.css">
+</head>
+<body>
+  <form data-form="comp-events" data-title="Composite Events" data-version="1.0">
+    <!-- Definition: counter block with + / - buttons -->
+    <div data-composite-def="counter-block" hidden>
+      <div data-runtime>
+        <div class="counter" style="display:flex;align-items:center;gap:6px;">
+          <button type="button" class="btn-dec">-</button>
+          <input type="number" class="val" value="0" style="width:80px;">
+          <button type="button" class="btn-inc">+</button>
+        </div>
+      </div>
+    </div>
+
+    <section data-section id="sec" data-title="Counter Demo">
+      <div>
+        <div data-composite="counter-block" id="ctr1" data-events="click:.btn-inc=>counter.inc; click:.btn-dec=>counter.dec; ready=>counter.ready"></div>
+      </div>
+      <div style="margin-top:10px;" id="log"></div>
+    </section>
+  </form>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="../../frontend/src/js/composites.js"></script>
+  <script src="../../frontend/src/js/expression-evaluator.js"></script>
+  <script src="../../frontend/src/js/validation.js"></script>
+  <script src="../../frontend/src/js/table-manager.js"></script>
+  <script src="../../frontend/src/js/widgets/table.js"></script>
+  <script src="../../frontend/src/js/data-fetch.js"></script>
+  <script src="../../frontend/src/js/formruntime.js"></script>
+  <script>
+    $(function(){
+      var rt = FormRuntimeHTMLDSL.mount('form[data-form]');
+      var $form = rt.$form;
+      function append(msg){ $('#log').append('<div>'+msg+'</div>'); }
+      $form.on('formdsl:composite:counter.ready', function(e, payload){ append('Ready: '+ payload.widgetId); });
+      $form.on('formdsl:composite:counter.inc', function(e, payload){ var $root = $('#'+payload.widgetId); var $val = $root.find('.val'); $val.val((parseInt($val.val()||'0',10)+1)); append('Increment'); });
+      $form.on('formdsl:composite:counter.dec', function(e, payload){ var $root = $('#'+payload.widgetId); var $val = $root.find('.val'); $val.val((parseInt($val.val()||'0',10)-1)); append('Decrement'); });
+    });
+  </script>
+</body>
+</html>
+

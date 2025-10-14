@@ -1,0 +1,23 @@
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Form Details";
+    var formJson = ViewData["FormJson"] as string ?? "{}";
+}
+
+<div class="card">
+    <h2>Form Details</h2>
+    <pre id="json"></pre>
+    <div style="margin-top:10px;">
+        <a id="previewLink" class="btn btn-primary" href="#">Preview</a>
+    </div>
+</div>
+
+<script>
+    (function(){
+        var obj = @Html.Raw(formJson);
+        document.getElementById('json').textContent = JSON.stringify(obj, null, 2);
+        var previewHref = '/ui/forms/' + (obj.id || '') + '/preview';
+        document.getElementById('previewLink').setAttribute('href', previewHref);
+    })();
+</script>
+

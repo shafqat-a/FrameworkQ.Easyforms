@@ -1,0 +1,39 @@
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Forms";
+    var formsJson = ViewData["FormsJson"] as string ?? "[]";
+}
+
+<div class="card">
+    <h2>Forms</h2>
+    <table style="width:100%; border-collapse:collapse;">
+        <thead>
+            <tr>
+                <th style="text-align:left; border-bottom:1px solid #ccc; padding:6px;">ID</th>
+                <th style="text-align:left; border-bottom:1px solid #ccc; padding:6px;">Title</th>
+                <th style="text-align:left; border-bottom:1px solid #ccc; padding:6px;">Version</th>
+                <th style="text-align:left; border-bottom:1px solid #ccc; padding:6px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="forms-body"></tbody>
+    </table>
+</div>
+
+<script>
+    (function(){
+        var forms = @Html.Raw(formsJson);
+        var $tbody = $('#forms-body');
+        forms.forEach(function(f){
+            var tr = $('<tr/>');
+            tr.append('<td style="padding:6px;border-bottom:1px solid #eee;">'+ f.id +'</td>');
+            tr.append('<td style="padding:6px;border-bottom:1px solid #eee;">'+ (f.title||'') +'</td>');
+            tr.append('<td style="padding:6px;border-bottom:1px solid #eee;">'+ (f.version||'') +'</td>');
+            tr.append('<td style="padding:6px;border-bottom:1px solid #eee;">'
+                + '<a href="/ui/forms/'+ f.id +'">Details</a> | '
+                + '<a href="/ui/forms/'+ f.id +'/preview">Preview</a>'
+                + '</td>');
+            $tbody.append(tr);
+        });
+    })();
+</script>
+

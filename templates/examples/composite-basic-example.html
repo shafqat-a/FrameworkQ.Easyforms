@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Composite Basic Example</title>
+  <link rel="stylesheet" href="../../frontend/src/css/forms.css">
+</head>
+<body>
+  <form data-form="comp-basic" data-title="Composite Basic" data-version="1.0">
+
+    <!-- Definition: simple meter badge -->
+    <div data-composite-def="meter-badge" hidden>
+      <div data-runtime>
+        <div class="meter" style="padding:8px;border:1px solid #ddd;border-radius:4px;display:inline-block;">
+          <strong data-prop-bind="title">{{prop:title}}</strong>
+          <span style="color:#666; margin-left:6px;">(<span data-prop-bind="unit">{{prop:unit}}</span>)</span>
+        </div>
+      </div>
+    </div>
+
+    <section data-section id="s1" data-title="Sample">
+      <div data-group data-layout="columns:2">
+        <div>
+          <label>Meter A</label>
+          <div data-composite="meter-badge" id="mb1" data-prop-title="Voltage" data-prop-unit="kV"></div>
+        </div>
+        <div>
+          <label>Meter B</label>
+          <div data-composite="meter-badge" id="mb2" data-prop-title="Current" data-prop-unit="A"></div>
+        </div>
+      </div>
+    </section>
+
+    <div style="margin-top: 12px;">
+      <button type="submit">Submit</button>
+    </div>
+  </form>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="../../frontend/src/js/composites.js"></script>
+  <script src="../../frontend/src/js/expression-evaluator.js"></script>
+  <script src="../../frontend/src/js/validation.js"></script>
+  <script src="../../frontend/src/js/table-manager.js"></script>
+  <script src="../../frontend/src/js/widgets/table.js"></script>
+  <script src="../../frontend/src/js/data-fetch.js"></script>
+  <script src="../../frontend/src/js/formruntime.js"></script>
+  <script>
+    $(function(){ FormRuntimeHTMLDSL.mount('form[data-form]'); });
+  </script>
+</body>
+</html>
+
