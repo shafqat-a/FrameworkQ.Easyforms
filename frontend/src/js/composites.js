@@ -55,7 +55,15 @@
             });
             html = html.replace(/\{\{\s*prop:([\w-]+)\s*\}\}/g, function(_, p1){ return props[p1] || ''; });
 
+            // Preserve any existing children if definition provides a slot
+            var $existingChildren = $inst.contents().detach();
+            var hasSlot = /data-slot/.test(html);
             $inst.html(html);
+            if (hasSlot && $existingChildren.length){
+                var $slot = $inst.find('[data-slot]').first();
+                if ($slot.length) { $slot.append($existingChildren); }
+                else { $inst.append($existingChildren); }
+            }
 
             // Secondary binding: elements with [data-prop-bind="name"] get text/value
             $inst.find('[data-prop-bind]').each(function(){

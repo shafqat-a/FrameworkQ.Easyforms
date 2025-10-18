@@ -1,0 +1,107 @@
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Composite - Beginner (All-in-one)";
+}
+
+<div class="card">
+    <h2>Composite - Beginner (All-in-one)</h2>
+    <p class="muted">This single composite shows: properties, events, state, designer/runtime views, and container slot.</p>
+    <form data-form="comp-beginner" data-title="Composite Beginner" data-version="1.0">
+
+        <!-- Definition: demo-card (supports container via [data-slot]) -->
+        <div data-composite-def="demo-card" data-container="true" hidden>
+            <div data-designer>
+                <div style="padding:8px;border:1px dashed #999;color:#666;">
+                    [Designer] <strong>{{prop:title}}</strong> — <span class="muted">{{prop:subtitle}}</span>
+                </div>
+            </div>
+            <div data-runtime>
+                <div class="demo-card" style="border:2px solid {{prop:accent}};border-radius:8px;padding:10px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                        <div>
+                            <strong data-prop-bind="title">{{prop:title}}</strong>
+                            <span class="muted" style="margin-left:6px;" data-prop-bind="subtitle">{{prop:subtitle}}</span>
+                        </div>
+                        <div>
+                            <button type="button" class="btn-inc">+1</button>
+                            <button type="button" class="btn-dec">-1</button>
+                        </div>
+                    </div>
+                    <div style="margin-top:8px;display:flex;gap:6px;align-items:center;">
+                        <label class="muted">Count</label>
+                        <input type="number" value="0" data-state-key="count" style="width:90px;">
+                        <label class="muted">Note</label>
+                        <input type="text" placeholder="Type a note" data-state-key="note" style="flex:1;">
+                    </div>
+                    <div class="demo-card-slot" data-slot style="margin-top:10px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <section data-section id="sec1" data-title="Non-Container">
+            <div data-group data-layout="columns:2">
+                <div>
+                    <label>Runtime</label>
+                    <div data-composite="demo-card" id="dc1"
+                         data-prop-title="Demo Card"
+                         data-prop-subtitle="Non-container"
+                         data-prop-accent="#2d8cff"
+                         data-events="click:.btn-inc=>demo.inc; click:.btn-dec=>demo.dec; ready=>demo.ready"></div>
+                </div>
+                <div>
+                    <label>Designer View</label>
+                    <div data-composite="demo-card" id="dc2" data-view="designer"
+                         data-prop-title="Demo Card"
+                         data-prop-subtitle="Designer"
+                         data-prop-accent="#2d8cff"
+                         data-events="ready=>demo.ready"></div>
+                </div>
+            </div>
+        </section>
+
+        <section data-section id="sec2" data-title="Container (with children)">
+            <div>
+                <div data-composite="demo-card" id="dc3"
+                     data-container="true" data-parse-children
+                     data-prop-title="Card with Content"
+                     data-prop-subtitle="Container"
+                     data-prop-accent="#00a86b"
+                     data-events="click:.btn-inc=>demo.inc; click:.btn-dec=>demo.dec; ready=>demo.ready">
+                    <!-- These children are preserved into the [data-slot] area -->
+                    <div>
+                        <label for="inner_name">Inner Name</label>
+                        <input id="inner_name" name="inner_name" type="text" placeholder="Your name">
+                    </div>
+                    <div class="muted">Any HTML can go here; fields will submit like normal.</div>
+                </div>
+            </div>
+        </section>
+
+        <section data-section id="sec3" data-title="State Save/Restore">
+            <div>
+                <button type="button" class="btn btn-secondary" id="btnSaveState">Save State</button>
+                <button type="button" class="btn btn-secondary" id="btnRestoreState">Restore State</button>
+                <textarea id="stateJson" rows="6" style="width:100%;margin-top:8px;"></textarea>
+                <div id="log" class="muted" style="margin-top:8px;"></div>
+            </div>
+        </section>
+    </form>
+</div>
+
+<script>
+    $(function(){
+        var rt = FormRuntimeHTMLDSL.mount('form[data-form]');
+        var $form = rt.$form;
+        function log(msg){ $('#log').append($('<div/>').text(msg)); }
+
+        // Composite event handlers
+        $form.on('formdsl:composite:demo.ready', function(e, payload){ log('Ready: ' + payload.widgetId); });
+        $form.on('formdsl:composite:demo.inc', function(e, payload){ var $root = $('#'+payload.widgetId); var $val = $root.find('[data-state-key="count"]'); var n = parseInt($val.val()||'0',10); $val.val(n+1).trigger('change'); log('Increment ' + payload.widgetId); });
+        $form.on('formdsl:composite:demo.dec', function(e, payload){ var $root = $('#'+payload.widgetId); var $val = $root.find('[data-state-key="count"]'); var n = parseInt($val.val()||'0',10); $val.val(n-1).trigger('change'); log('Decrement ' + payload.widgetId); });
+
+        // Save/restore composite state demo
+        $('#btnSaveState').on('click', function(){ var st = window.CompositeWidgets.getState(rt.$form); $('#stateJson').val(JSON.stringify(st, null, 2)); });
+        $('#btnRestoreState').on('click', function(){ try { var obj = JSON.parse($('#stateJson').val()||'{}'); window.CompositeWidgets.setState(rt.$form, obj); } catch(e){ alert('Invalid JSON'); } });
+    });
+</script>
+

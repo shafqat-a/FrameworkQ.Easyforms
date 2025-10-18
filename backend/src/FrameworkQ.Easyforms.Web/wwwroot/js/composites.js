@@ -20,7 +20,9 @@
             var $inst=$(this); if ($inst.data('compositeRendered')) return; var name=$inst.attr('data-composite'); var def=registry[name]; if (!def){ console.warn('[Composite] Missing def:', name); return; }
             var view = ($inst.attr('data-view')||'runtime').toLowerCase(); var html=(view==='designer'?def.designerHtml:def.runtimeHtml)||def.html||''; var props={}; $.each(this.attributes, function(){ var an=(this.name||'').toLowerCase(); if (an.startsWith('data-prop-')){ var pn=an.substring('data-prop-'.length); props[pn]=this.value||''; } });
             html=html.replace(/\{\{\s*prop:([\w-]+)\s*\}\}/g, function(_,p1){ return props[p1]||''; });
+            var $existingChildren=$inst.contents().detach(); var hasSlot=/data-slot/.test(html);
             $inst.html(html);
+            if(hasSlot && $existingChildren.length){ var $slot=$inst.find('[data-slot]').first(); if($slot.length){ $slot.append($existingChildren);} else { $inst.append($existingChildren);} }
             $inst.find('[data-prop-bind]').each(function(){ var $el=$(this); var key=$el.attr('data-prop-bind'); var val=props[key]||''; if ($el.is('input,select,textarea')) $el.val(val); else $el.text(val); });
             wireEvents($inst, props);
             $inst.data('compositeRendered', true);

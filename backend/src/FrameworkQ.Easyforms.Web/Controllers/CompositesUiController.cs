@@ -22,4 +22,7 @@ public class CompositesUiController : Controller
 
     [HttpGet("smart-table")]
     public IActionResult SmartTable() => View();
+
+    [HttpGet("beginner")]
+    public IActionResult Beginner() => View();
 }
